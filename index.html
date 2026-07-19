@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الرئيسية - Le Français avec Madame Aya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f8f9fa; color: #333; line-height: 1.6; top: 0px !important; position: static !important; }
+        
+        /* إخفاء أدوات جوجل بالكامل */
+        iframe.goog-te-banner-frame { display: none !important; }
+        #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+        .goog-text-highlight { background: transparent !important; box-shadow: none !important; }
+        #google_translate_element { opacity: 0; position: absolute; z-index: -1; width: 0; height: 0; overflow: hidden; }
+
+        nav { background-color: #2c3e50; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 15px;}
+        .logo { color: white; font-size: 24px; font-weight: 900; }
+        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .nav-links li a { color: white; text-decoration: none; font-size: 18px; transition: 0.3s; padding: 5px 10px; border-radius: 5px; }
+        .nav-links li a:hover, .active { background-color: #e74c3c; }
+
+        .custom-lang-selector { background-color: #34495e; color: white; border: 1px solid #bdc3c7; padding: 5px 10px; border-radius: 5px; font-size: 16px; cursor: pointer; outline: none; font-weight: bold; }
+        .custom-lang-selector:hover { background-color: #2c3e50; }
+
+        .hero { background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); color: white; text-align: center; padding: 80px 20px; }
+        .hero h1 { font-size: 50px; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .hero p { font-size: 22px; margin-bottom: 40px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .start-btn { background-color: #e74c3c; color: white; padding: 15px 40px; font-size: 22px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: inline-block; }
+        .start-btn:hover { background-color: #c0392b; transform: translateY(-5px); }
+
+        .how-it-works { padding: 60px 20px; text-align: center; background-color: white; }
+        .how-it-works h2 { color: #2c3e50; font-size: 36px; margin-bottom: 40px; }
+        .steps-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; max-width: 1000px; margin: auto; }
+        .step-box { background: #f8f9fa; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); flex: 1; min-width: 250px; border-top: 5px solid #3498db; transition: 0.3s; }
+        .step-box:hover { transform: translateY(-5px); }
+        .step-icon { font-size: 40px; margin-bottom: 15px; }
+        .step-box h3 { color: #e74c3c; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">🇫🇷 Madame Aya</div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+            <li><a href="courses.html">المنصة التعليمية</a></li>
+            <li>
+                <select class="custom-lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="hero">
+        <h1>طريقك لإتقان اللغة الفرنسية</h1>
+        <p>مرحباً بك في منصة Madame Aya المتكاملة. شروحات تفاعلية، فيديوهات ممتعة، وتدريبات لضمان تفوقك.</p>
+        <a href="courses.html" class="start-btn">🚀 ابدأ التعلم الآن</a>
+    </div>
+
+    <div class="how-it-works">
+        <h2>كيف تبدأ رحلتك معنا؟ 🎓</h2>
+        <div class="steps-container">
+            <div class="step-box">
+                <div class="step-icon">1️⃣</div>
+                <h3>اختر مرحلتك</h3>
+                <p>ادخل إلى المنصة التعليمية وقم باختيار صفك الدراسي من القائمة لتظهر لك كل الدروس.</p>
+            </div>
+            <div class="step-box" style="border-color: #e67e22;">
+                <div class="step-icon">2️⃣</div>
+                <h3>شاهد الدرس</h3>
+                <p>استمتع بشرح تفاعلي وبسيط من خلال فيديوهات قصيرة صممت خصيصاً لتوصيل المعلومة.</p>
+            </div>
+            <div class="step-box" style="border-color: #2ecc71;">
+                <div class="step-icon">3️⃣</div>
+                <h3>اختبر نفسك</h3>
+                <p>بعد كل فيديو، ستجد سؤالاً اختبارياً لتتأكد من فهمك للدرس وتثبيت المعلومة فوراً.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- كود الترجمة بدون أشرطة جوجل المزعجة -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'ar', includedLanguages: 'ar,en,fr', autoDisplay: false }, 'google_translate_element');
+        }
+        function changeLanguage(lang) {
+            var selectField = document.querySelector(".goog-te-combo");
+            if (selectField) {
+                selectField.value = lang;
+                selectField.dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- كود تتبع زوار الموقع أوتوماتيكياً -->
+    <script type="module">
+        import { db, doc, updateDoc, setDoc, getDoc, increment } from './firebase-config.js';
+        
+        async function trackVisitor() {
+            if (!sessionStorage.getItem("visited_already")) {
+                const statsRef = doc(db, "settings", "stats");
+                try {
+                    const docSnap = await getDoc(statsRef);
+                    if (docSnap.exists()) {
+                        await updateDoc(statsRef, { visitors: increment(1) });
+                    } else {
+                        await setDoc(statsRef, { visitors: 1 });
+                    }
+                    sessionStorage.setItem("visited_already", "true");
+                } catch (e) {
+                    console.error("Error tracking visitor: ", e);
+                }
+            }
+        }
+        trackVisitor();
+    </script>
+
+</body>
+</html>
