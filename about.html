@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>من نحن - Le Français avec Madame Aya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f8f9fa; color: #333; line-height: 1.8; top: 0px !important; position: static !important; }
+        
+        iframe.goog-te-banner-frame { display: none !important; }
+        #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+        .goog-text-highlight { background: transparent !important; box-shadow: none !important; }
+        #google_translate_element { opacity: 0; position: absolute; z-index: -1; width: 0; height: 0; overflow: hidden; }
+
+        nav { background-color: #2c3e50; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 15px;}
+        .logo { color: white; font-size: 24px; font-weight: 900; }
+        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .nav-links li a { color: white; text-decoration: none; font-size: 18px; transition: 0.3s; padding: 5px 10px; border-radius: 5px; }
+        .nav-links li a:hover, .active { background-color: #e74c3c; }
+
+        .custom-lang-selector { background-color: #34495e; color: white; border: 1px solid #bdc3c7; padding: 5px 10px; border-radius: 5px; font-size: 16px; cursor: pointer; outline: none; font-weight: bold; }
+        .custom-lang-selector:hover { background-color: #2c3e50; }
+
+        .container { max-width: 900px; margin: 50px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 5px solid #3498db; }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 30px; font-size: 36px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        h2 { color: #e74c3c; margin-top: 30px; margin-bottom: 15px; }
+        p { font-size: 18px; color: #555; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">🇫🇷 Madame Aya</div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html" class="active">من نحن</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+            <li><a href="courses.html">المنصة التعليمية</a></li>
+            <li>
+                <select class="custom-lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1>من نحن؟</h1>
+        <h2>👩‍🏫 مادام آية (Madame Aya)</h2>
+        <p>مادام آية هي معلمة متخصصة ومتميزة في تدريس اللغة الفرنسية. تمتلك شغفاً كبيراً بتطوير أساليب التدريس، وتؤمن بأن التعليم يجب أن يكون ممتعاً، تفاعلياً، ويواكب العصر الرقمي.</p>
+        <p>تسعى دائماً لتحويل المناهج الدراسية التقليدية إلى محتوى بصري جذاب يسهل على الطالب فهمه وحفظه دون عناء.</p>
+
+        <h2>🎯 رؤية المنصة</h2>
+        <p>تم تصميم هذه المنصة لتكون البديل الأذكى والأسهل للدروس التقليدية. نحن نعتمد على استراتيجية الفيديوهات التعليمية القصيرة والمركزة التي تكسر حاجز الملل وتضمن توصيل المعلومة بكفاءة عالية.</p>
+    </div>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'ar', includedLanguages: 'ar,en,fr', autoDisplay: false }, 'google_translate_element');
+        }
+        function changeLanguage(lang) {
+            var selectField = document.querySelector(".goog-te-combo");
+            if (selectField) {
+                selectField.value = lang;
+                selectField.dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>

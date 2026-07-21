@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المنصة التعليمية - Madame Aya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f4f7f6; color: #333; }
+        
+        iframe.goog-te-banner-frame { display: none !important; }
+        #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+        .goog-text-highlight { background: transparent !important; box-shadow: none !important; }
+        #google_translate_element { opacity: 0; position: absolute; z-index: -1; width: 0; height: 0; overflow: hidden; }
+
+        nav { background-color: #2c3e50; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px; }
+        .logo { color: white; font-size: 24px; font-weight: 900; }
+        .nav-links { list-style: none; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        .nav-links li a { color: white; text-decoration: none; font-size: 18px; padding: 5px 10px; }
+        .admin-login-btn { background: #e74c3c; color: white; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; border: none; transition: 0.3s; }
+        .admin-login-btn:hover { background: #c0392b; transform: scale(1.05); }
+        .custom-lang-selector { background-color: #34495e; color: white; border: 1px solid #bdc3c7; padding: 5px 10px; border-radius: 5px; font-size: 16px; cursor: pointer; outline: none; font-weight: bold; }
+        
+        .header-controls { text-align: center; padding: 30px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .header-controls select { padding: 15px; font-size: 18px; border-radius: 8px; border: 2px solid #ccc; outline: none; width: 350px; max-width: 90%; font-weight: bold; }
+        .header-controls button { padding: 15px 30px; background-color: #3498db; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 18px; cursor: pointer; margin-right: 10px; transition: 0.3s; }
+        .header-controls button:hover { background-color: #2980b9; transform: translateY(-2px); }
+
+        .container { max-width: 1200px; margin: auto; padding: 0 20px; }
+        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+        .video-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.08); cursor: pointer; transition: 0.3s; position: relative; border: 1px solid #eee; }
+        .video-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); border-color: #3498db; }
+        .thumbnail { width: 100%; height: 200px; object-fit: cover; }
+        .video-info { padding: 20px; }
+        .video-info h3 { color: #2c3e50; font-size: 20px; margin-bottom: 10px; }
+        .video-stats-small { font-size: 15px; color: #7f8c8d; font-weight: bold; }
+
+        .full-page-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #f8fbff; z-index: 2000; overflow-y: auto; padding-bottom: 80px; }
+        .fp-header { background: #2c3e50; color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2001; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .fp-header h2 { font-size: 24px; margin: 0; }
+        .fp-header button { background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.3s; }
+        .fp-header button:hover { background: #c0392b; transform: scale(1.05); }
+        .fp-content { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        
+        .fp-video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #fff; }
+        .fp-video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .stats-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 15px; border-right: 6px solid #3498db; }
+        .like-btn { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.3s; box-shadow: 0 4px 10px rgba(231,76,60,0.3); }
+        .like-btn:hover { background: #c0392b; transform: scale(1.05); }
+
+        .student-gate { background: white; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 40px; border-top: 5px solid #2ecc71; }
+        .student-gate h3 { color: #2c3e50; font-size: 26px; margin-bottom: 15px; }
+        .student-gate p { color: #7f8c8d; font-size: 18px; margin-bottom: 25px; }
+        .gate-input { width: 100%; max-width: 500px; padding: 15px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 18px; font-family: 'Cairo', sans-serif; outline: none; }
+        .gate-input:focus { border-color: #2ecc71; }
+        .gate-btn { background: #2ecc71; color: white; border: none; padding: 15px 40px; font-size: 20px; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; max-width: 500px; }
+        .gate-btn:hover { background: #27ae60; transform: translateY(-2px); }
+
+        .exam-title { text-align: center; color: #2c3e50; font-size: 32px; font-weight: 900; margin: 50px 0 30px; position: relative; }
+        .exam-title::after { content: ''; width: 80px; height: 4px; background: #3498db; display: block; margin: 10px auto 0; border-radius: 5px; }
+        
+        .single-question { background: white; padding: 35px; border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); margin-bottom: 30px; border: 1px solid #e2e8f0; border-top: 5px solid #2c3e50; transition: 0.3s; }
+        .single-question h3 { color: #1a202c; font-size: 24px; margin-bottom: 25px; line-height: 1.5; }
+        .options-box { display: flex; flex-direction: column; gap: 15px; }
+        .option-btn { display: block; width: 100%; text-align: right; padding: 18px 25px; border: 2px solid #e2e8f0; border-radius: 10px; background: #f8fafc; cursor: pointer; font-size: 20px; font-weight: bold; color: #4a5568; transition: all 0.3s ease; }
+        .option-btn:hover:not([disabled]) { background: #ebf8ff; border-color: #3182ce; color: #2b6cb0; padding-right: 35px; }
+        .feedback-msg { margin-top: 20px; font-weight: 900; font-size: 20px; text-align: center; padding: 10px; border-radius: 8px; }
+
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .login-modal-content { background-color: white; padding: 40px; border-radius: 20px; width: 90%; max-width: 450px; text-align: center; position: relative; }
+        .login-close { position: absolute; top: 15px; right: 25px; font-size: 35px; cursor: pointer; color: #a0aec0; }
+        .login-modal-content input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; font-size: 18px; }
+        .login-modal-content button { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; font-size: 20px; color: white; cursor: pointer; margin-top: 15px; background-color: #2c3e50; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">🇫🇷 Madame Aya</div>
+        <ul class="nav-links">
+            <li><button class="admin-login-btn" id="openAdminLogin">🔒 دخول الإدارة</button></li>
+        </ul>
+    </nav>
+
+    <div class="header-controls">
+        <select id="gradeSelect">
+            <option value="">-- اختر المرحلة الدراسية --</option>
+            <option value="4_primary">الصف الرابع الابتدائي</option>
+            <option value="5_primary">الصف الخامس الابتدائي</option>
+            <option value="6_primary">الصف السادس الابتدائي</option>
+            <option value="1_prep">الصف الأول الإعدادي</option>
+            <option value="2_prep">الصف الثاني الإعدادي</option>
+            <option value="3_prep">الصف الثالث الإعدادي</option>
+            <option value="1_sec">الصف الأول الثانوي</option>
+            <option value="2_sec">الصف الثاني الثانوي</option>
+            <option value="3_sec">الصف الثالث الثانوي</option>
+        </select>
+        <button id="fetchVideosBtn">🔍 عرض الدروس</button>
+    </div>
+
+    <div class="container"><div id="playlistContainer" class="video-grid"></div></div>
+
+    <div id="adminLoginModal" class="modal">
+        <div class="login-modal-content">
+            <span class="login-close" id="closeAdminLogin">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #2d3748;">تسجيل دخول الإدارة</h2>
+            <input type="email" id="adminEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="adminPassword" placeholder="كلمة المرور">
+            <button id="adminLoginBtn">دخول الآن</button>
+        </div>
+    </div>
+
+    <div id="fullPageView" class="full-page-view">
+        <div class="fp-header">
+            <h2 id="fpTitle">عنوان الدرس</h2>
+            <button id="closeFpBtn">⬅️ إغلاق والعودة للمنصة</button>
+        </div>
+        <div class="fp-content">
+            <div class="fp-video-container"><iframe id="fpVideoPlayer" src="" allowfullscreen></iframe></div>
+            
+            <div class="stats-bar">
+                <h2 id="fpVideoTitleDown" style="font-size: 26px;">العنوان</h2>
+                <div style="display: flex; gap: 20px; align-items: center; font-size: 20px; font-weight: bold; color: #7f8c8d;">
+                    <span>👁️ <span id="fpViews">0</span> مشاهدة</span>
+                    <button id="fpLikeBtn" class="like-btn">👍 أعجبني <span id="fpLikes">0</span></button>
+                </div>
+            </div>
+
+            <!-- بوابة إدخال البيانات -->
+            <div id="studentGateArea"></div>
+
+            <!-- منطقة الامتحانات -->
+            <div id="fpQuestionsArea" style="display: none;"></div>
+            
+            <!-- منطقة النتيجة والشهادة -->
+            <div id="finalResultArea"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, collection, getDocs, query, where, doc, updateDoc, increment, addDoc, signInWithEmailAndPassword } from './firebase-config.js';
+
+        const adminLoginModal = document.getElementById("adminLoginModal");
+        document.getElementById("openAdminLogin").addEventListener("click", () => {
+            if (auth.currentUser && auth.currentUser.email === "yonisaya123@gmail.com") window.location.href = "admin.html";
+            else adminLoginModal.style.display = "flex";
+        });
+        document.getElementById("closeAdminLogin").addEventListener("click", () => adminLoginModal.style.display = "none");
+        
+        document.getElementById("adminLoginBtn").addEventListener("click", () => {
+            signInWithEmailAndPassword(auth, document.getElementById("adminEmail").value, document.getElementById("adminPassword").value)
+                .then((cred) => {
+                    if (cred.user.email === "yonisaya123@gmail.com") window.location.href = "admin.html";
+                    else alert("ليس لديك صلاحيات الإدارة!");
+                }).catch(() => alert("بيانات الدخول خاطئة!"));
+        });
+
+        function getYouTubeId(url) {
+            let vId = "";
+            if (url.includes("v=")) vId = url.split("v=")[1].substring(0, 11);
+            else if (url.includes("youtu.be/")) vId = url.split("youtu.be/")[1].substring(0, 11);
+            return vId;
+        }
+
+        let currentVideoId = null;
+
+        document.getElementById("fetchVideosBtn").addEventListener("click", async () => {
+            const selectedGrade = document.getElementById("gradeSelect").value;
+            const container = document.getElementById("playlistContainer");
+            if (!selectedGrade) return alert("الرجاء اختيار المرحلة أولاً!");
+            
+            container.innerHTML = "<h3 style='grid-column: 1 / -1; text-align:center; font-size:24px; margin-top:50px;'>جاري التحميل... ⏳</h3>";
+
+            try {
+                const q = query(collection(db, "playlists"), where("grade", "==", selectedGrade));
+                const querySnapshot = await getDocs(q);
+                container.innerHTML = ""; 
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = "<h3 style='grid-column: 1 / -1; text-align:center; color:#7f8c8d; font-size:24px; margin-top:50px;'>لا توجد دروس حالياً في هذه المرحلة.</h3>";
+                    return;
+                }
+
+                querySnapshot.forEach((documentSnapshot) => {
+                    const data = documentSnapshot.data();
+                    const docId = documentSnapshot.id;
+                    const videoId = getYouTubeId(data.url);
+                    const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : 'https://via.placeholder.com/300x180';
+
+                    const card = document.createElement("div");
+                    card.className = "video-card";
+                    card.innerHTML = `
+                        <img src="${thumbnailUrl}" class="thumbnail" onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'">
+                        <div class="video-info">
+                            <h3>${data.title}</h3>
+                            <span class="video-stats-small">👁️ ${data.views || 0} مشاهدة &nbsp; | &nbsp; 👍 ${data.likes || 0} إعجاب</span>
+                        </div>
+                    `;
+                    
+                    card.addEventListener("click", async () => {
+                        currentVideoId = docId;
+                        document.getElementById("fpTitle").innerText = data.title;
+                        document.getElementById("fpVideoTitleDown").innerText = data.title;
+                        document.getElementById("fpVideoPlayer").src = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : data.url;
+                        
+                        document.getElementById("fpViews").innerText = (data.views || 0) + 1;
+                        document.getElementById("fpLikes").innerText = data.likes || 0;
+                        await updateDoc(doc(db, "playlists", docId), { views: increment(1) });
+
+                        const gateArea = document.getElementById("studentGateArea");
+                        const qArea = document.getElementById("fpQuestionsArea");
+                        const resArea = document.getElementById("finalResultArea");
+                        
+                        gateArea.innerHTML = "";
+                        qArea.innerHTML = "";
+                        resArea.innerHTML = "";
+                        qArea.style.display = "none";
+
+                        let currentScore = 0;
+                        let totalQs = 0;
+                        let answeredCount = 0;
+
+                        if (data.questions && data.questions.length > 0) {
+                            totalQs = data.questions.length;
+                            
+                            gateArea.innerHTML = `
+                                <div class="student-gate">
+                                    <h3>📝 اختبر نفسك واستلم شهادتك</h3>
+                                    <p>الرجاء إدخال بياناتك لفتح أسئلة الدرس (يجب الحصول على 70% لاستلام الشهادة)</p>
+                                    <input type="text" id="tempName" class="gate-input" placeholder="الاسم (كما سيظهر في الشهادة)"><br>
+                                    <input type="email" id="tempEmail" class="gate-input" placeholder="البريد الإلكتروني"><br>
+                                    <button id="openExamBtn" class="gate-btn">ابدأ الاختبار الآن 🚀</button>
+                                </div>
+                            `;
+
+                            document.getElementById("openExamBtn").addEventListener("click", () => {
+                                const finalName = document.getElementById("tempName").value.trim();
+                                const finalEmail = document.getElementById("tempEmail").value.trim();
+                                
+                                if(!finalName || !finalEmail) {
+                                    alert("يجب إدخال الاسم والإيميل لفتح الامتحان!");
+                                    return;
+                                }
+
+                                gateArea.innerHTML = "";
+                                qArea.style.display = "block";
+                                qArea.innerHTML = "<h2 class='exam-title'>بالتوفيق يا " + finalName + " 🎯</h2>";
+
+                                data.questions.forEach((qObj, index) => {
+                                    const qDiv = document.createElement("div");
+                                    qDiv.className = "single-question";
+                                    qDiv.setAttribute("data-answered", "false");
+                                    qDiv.innerHTML = `
+                                        <h3>السؤال ${index + 1}: ${qObj.q}</h3>
+                                        <div class="options-box"></div>
+                                        <p class="feedback-msg"></p>
+                                    `;
+                                    const optsBox = qDiv.querySelector('.options-box');
+                                    const feedback = qDiv.querySelector('.feedback-msg');
+                                    
+                                    [qObj.opt1, qObj.opt2, qObj.opt3].forEach((optText, optIndex) => {
+                                        if(optText) {
+                                            const btn = document.createElement("button");
+                                            btn.className = "option-btn";
+                                            btn.innerText = optText;
+                                            btn.onclick = async () => {
+                                                if (qDiv.getAttribute("data-answered") === "false") {
+                                                    qDiv.setAttribute("data-answered", "true");
+                                                    answeredCount++;
+                                                }
+
+                                                optsBox.querySelectorAll('button').forEach(b => {
+                                                    b.disabled = true; b.style.cursor = "not-allowed"; b.style.opacity = "0.6";
+                                                });
+                                                btn.style.opacity = "1"; 
+                                                
+                                                if ((optIndex + 1).toString() === qObj.correct) {
+                                                    btn.style.backgroundColor = "#d4edda"; btn.style.borderColor = "#28a745"; btn.style.color = "#155724";
+                                                    feedback.innerText = "✅ إجابة صحيحة!"; feedback.style.color = "#27ae60"; feedback.style.backgroundColor = "#e8f8f5";
+                                                    currentScore++;
+                                                } else {
+                                                    btn.style.backgroundColor = "#f8d7da"; btn.style.borderColor = "#dc3545"; btn.style.color = "#721c24";
+                                                    feedback.innerText = "❌ إجابة خاطئة، الصحيح هو: (" + [qObj.opt1, qObj.opt2, qObj.opt3][parseInt(qObj.correct)-1] + ")"; 
+                                                    feedback.style.color = "#c0392b"; feedback.style.backgroundColor = "#fdedf0";
+                                                }
+
+                                                if (answeredCount === totalQs) {
+                                                    const percentage = (currentScore / totalQs) * 100;
+                                                    
+                                                    await addDoc(collection(db, "quiz_results"), {
+                                                        lesson_title: data.title, student_name: finalName, student_email: finalEmail,
+                                                        score: currentScore, total_questions: totalQs, timestamp: new Date().toISOString()
+                                                    });
+
+                                                    if (percentage >= 70) {
+                                                        const canvas = document.createElement("canvas");
+                                                        canvas.width = 1000; canvas.height = 700;
+                                                        const ctx = canvas.getContext("2d");
+
+                                                        // خلفية الشهادة
+                                                        const grd = ctx.createLinearGradient(0, 0, 1000, 700);
+                                                        grd.addColorStop(0, "#ffffff");
+                                                        grd.addColorStop(1, "#f4f7f9");
+                                                        ctx.fillStyle = grd;
+                                                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                                                        // الإطارات
+                                                        ctx.strokeStyle = "#1a365d"; ctx.lineWidth = 15; 
+                                                        ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+                                                        ctx.strokeStyle = "#d4af37"; ctx.lineWidth = 4; 
+                                                        ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
+                                                        
+                                                        // الأركان
+                                                        ctx.fillStyle = "#d4af37";
+                                                        ctx.fillRect(45, 45, 40, 6); ctx.fillRect(45, 45, 6, 40);
+                                                        ctx.fillRect(canvas.width - 85, 45, 40, 6); ctx.fillRect(canvas.width - 51, 45, 6, 40);
+                                                        ctx.fillRect(45, canvas.height - 51, 40, 6); ctx.fillRect(45, canvas.height - 85, 6, 40);
+                                                        ctx.fillRect(canvas.width - 85, canvas.height - 51, 40, 6); ctx.fillRect(canvas.width - 51, canvas.height - 85, 6, 40);
+
+                                                        ctx.textAlign = "center";
+                                                        
+                                                        // عنوان الموقع
+                                                        ctx.font = "italic 32px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#d4af37";
+                                                        ctx.fillText("Le Français avec Madame Aya", canvas.width / 2, 120);
+
+                                                        // العنوان الرئيسي (تم التصغير والحد الأقصى للعرض)
+                                                        ctx.font = "bold 42px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
+                                                        ctx.fillText("CERTIFICAT DE RÉUSSITE", canvas.width / 2, 200, 750);
+                                                        
+                                                        // خط فاصل
+                                                        ctx.beginPath(); ctx.moveTo(canvas.width/2 - 150, 230); ctx.lineTo(canvas.width/2 + 150, 230);
+                                                        ctx.strokeStyle = "#d4af37"; ctx.lineWidth = 2; ctx.stroke();
+
+                                                        // مهداة إلى
+                                                        ctx.font = "italic 26px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#4a5568";
+                                                        ctx.fillText("Décerné avec fierté à :", canvas.width / 2, 280);
+
+                                                        // اسم الطالب (استخدام خط Cairo لدعم العربية بشكل احترافي مع حد أقصى)
+                                                        ctx.font = "bold 60px 'Cairo', sans-serif"; ctx.fillStyle = "#e53e3e";
+                                                        ctx.fillText(finalName, canvas.width / 2, 350, 750);
+
+                                                        // النص الفرنسي
+                                                        ctx.font = "italic 24px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#4a5568";
+                                                        ctx.fillText("Pour avoir suivi et validé avec succès le cours :", canvas.width / 2, 420);
+
+                                                        // اسم الكورس (استخدام Cairo كخط أساسي لتجنب تقطيع الحروف العربية مع حد أقصى)
+                                                        ctx.font = "bold 38px 'Cairo', sans-serif"; ctx.fillStyle = "#2b6cb0";
+                                                        ctx.fillText(data.title, canvas.width / 2, 470, 750);
+
+                                                        const finalizeAndShow = (finalCertData) => {
+                                                            emailjs.init("UiYPZxZVHrQIg8xQq"); 
+                                                            const templateParams = {
+                                                                to_name: finalName, 
+                                                                to_email: finalEmail, 
+                                                                lesson_name: data.title,
+                                                                student_score: currentScore + " / " + totalQs
+                                                            };
+                                                            emailjs.send("service_i5eekp6", "template_6hd8s0v", templateParams).catch(err => console.log(err));
+
+                                                            resArea.innerHTML = `
+                                                                <div style="text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #27ae60;">
+                                                                    <h2 style="color:#27ae60; font-size: 32px; margin-bottom: 15px; font-weight: 900;">Félicitations ! (النتيجة: ${Math.round(percentage)}%) 🎉</h2>
+                                                                    <p style="font-size: 18px; color:#555; margin-bottom:20px;">تم إرسال نتيجتك لبريدك الإلكتروني. تفضل شهادة التفوق الخاصة بك:</p>
+                                                                    <img src="${finalCertData}" style="max-width: 100%; border-radius: 10px; border: 5px solid #1a365d; box-shadow: 0 15px 30px rgba(0,0,0,0.2); margin-bottom: 20px;">
+                                                                    <br>
+                                                                    <a href="${finalCertData}" download="Certificat_${finalName}.jpg" style="background: linear-gradient(135deg, #1a365d, #2b6cb0); color:white; padding:15px 35px; font-size: 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; box-shadow: 0 5px 15px rgba(43, 108, 176, 0.4); transition: 0.3s;">📥 Télécharger le certificat</a>
+                                                                </div>
+                                                            `;
+                                                            resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                        };
+
+                                                        // إضافة الصورة والتواريخ
+                                                        const sealImg = new Image();
+                                                        sealImg.src = 'preview.png';
+                                                        
+                                                        sealImg.onload = () => {
+                                                            ctx.drawImage(sealImg, canvas.width / 2 - 90, 485, 180, 180);
+
+                                                            const today = new Date().toLocaleDateString('fr-FR');
+                                                            ctx.font = "bold 22px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
+                                                            ctx.textAlign = "left";
+                                                            ctx.fillText("Date : " + today, 100, 600);
+                                                            
+                                                            ctx.textAlign = "right";
+                                                            ctx.fillText("Professeure :", canvas.width - 100, 580);
+                                                            ctx.font = "italic 20px 'Georgia', 'Times New Roman', serif";
+                                                            ctx.fillText("Madame Aya Wael", canvas.width - 100, 615);
+
+                                                            const finalCertificate = canvas.toDataURL("image/jpeg", 0.9);
+                                                            finalizeAndShow(finalCertificate);
+                                                        };
+
+                                                        sealImg.onerror = () => {
+                                                            const today = new Date().toLocaleDateString('fr-FR');
+                                                            ctx.font = "bold 24px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
+                                                            ctx.textAlign = "left";
+                                                            ctx.fillText("Date : " + today, 100, 600);
+                                                            ctx.textAlign = "right";
+                                                            ctx.fillText("Professeure : Madame Aya Wael", canvas.width - 100, 600);
+
+                                                            const finalCertificate = canvas.toDataURL("image/jpeg", 0.9);
+                                                            finalizeAndShow(finalCertificate);
+                                                        };
+
+                                                    } else {
+                                                        resArea.innerHTML = `
+                                                            <div style="text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #e74c3c;">
+                                                                <h2 style="color:#e74c3c; font-size: 32px; margin-bottom: 15px; font-weight: 900;">النتيجة: ${Math.round(percentage)}% 📉</h2>
+                                                                <p style="font-size: 20px; color:#2c3e50; font-weight:bold;">حاول مرة أخرى يا بطل! 💪</p>
+                                                                <p style="font-size: 18px; color:#7f8c8d; margin-top:10px;">للحصول على الشهادة يجب أن تكون نسبة إجاباتك الصحيحة 70% أو أكثر. شاهد الفيديو بتركيز وجرب الاختبار مرة ثانية.</p>
+                                                            </div>
+                                                        `;
+                                                        resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                    }
+                                                }
+                                            };
+                                            optsBox.appendChild(btn);
+                                        }
+                                    });
+                                    qArea.appendChild(qDiv);
+                                });
+                            });
+                        }
+                        
+                        document.getElementById("fullPageView").style.display = "block";
+                        document.body.style.overflow = "hidden"; 
+                    });
+                    container.appendChild(card);
+                });
+            } catch (error) { console.error(error); }
+        });
+
+        document.getElementById("fpLikeBtn").addEventListener("click", async function() {
+            if(!currentVideoId || this.disabled) return;
+            this.disabled = true; 
+            this.style.backgroundColor = "#27ae60"; 
+            this.style.boxShadow = "0 4px 10px rgba(39,174,96,0.3)";
+            this.innerHTML = "✅ تم الإعجاب";
+            document.getElementById("fpLikes").innerText = parseInt(document.getElementById("fpLikes").innerText) + 1;
+            await updateDoc(doc(db, "playlists", currentVideoId), { likes: increment(1) });
+        });
+
+        document.getElementById("closeFpBtn").addEventListener("click", () => {
+            document.getElementById("fullPageView").style.display = "none";
+            document.getElementById("fpVideoPlayer").src = ""; 
+            document.body.style.overflow = "auto"; 
+            currentVideoId = null;
+        });
+    </script>
+</body>
+</html>
