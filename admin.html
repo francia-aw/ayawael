@@ -25,6 +25,7 @@
         .add-q-btn { background-color: #48bb78; margin-bottom: 20px; }
         .lesson-item { background: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .delete-btn { background-color: #e53e3e; width: auto; padding: 8px 15px; margin: 0; }
+        .delete-result-btn { background-color: #e53e3e; padding: 5px 10px; font-size: 12px; border-radius: 5px; width: auto; margin: 0; }
         .logout-btn { background-color: #718096; width: auto; position: absolute; top: 20px; left: 20px; }
         
         /* جدول نتائج الطلاب */
@@ -50,7 +51,7 @@
     <!-- قسم نتائج الطلاب -->
     <div class="admin-container" style="margin-bottom: 20px;">
         <div class="card" style="width: 100%;">
-            <h2>📊 نتائج وإجابات الطلاب</h2>
+            <h2>📊 نتائج وإجابات الطلاب (الشهادات)</h2>
             <div style="overflow-x: auto;">
                 <table class="results-table">
                     <thead>
@@ -60,10 +61,11 @@
                             <th>الدرس</th>
                             <th>الدرجة</th>
                             <th>التاريخ</th>
+                            <th>إجراءات</th> <!-- تمت إضافة هذا العمود -->
                         </tr>
                     </thead>
                     <tbody id="studentsResultsBody">
-                        <tr><td colspan="5" style="text-align: center;">جاري التحميل...</td></tr>
+                        <tr><td colspan="6" style="text-align: center;">جاري التحميل...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -163,10 +165,12 @@
             const resultsSnapshot = await getDocs(collection(db, "quiz_results"));
             document.getElementById("totalExams").innerText = resultsSnapshot.size;
             resultsBody.innerHTML = "";
+            
             if (resultsSnapshot.empty) {
-                resultsBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>لا يوجد نتائج حتى الآن</td></tr>";
+                resultsBody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>لا يوجد نتائج حتى الآن</td></tr>";
                 return;
             }
+            
             resultsSnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 const date = data.timestamp ? new Date(data.timestamp).toLocaleDateString('ar-EG') : 'غير معروف';
@@ -177,12 +181,28 @@
                         <td>${data.lesson_title}</td>
                         <td style="color: green; font-weight: bold;">${data.score} / ${data.total_questions}</td>
                         <td>${date}</td>
+                        <td><button class="delete-result-btn" onclick="deleteResult('${docSnap.id}')">حذف</button></td> <!-- زر حذف النتيجة -->
                     </tr>
                 `;
             });
         }
         
-        window.deleteVideo = async (id) => { if(confirm("تأكيد الحذف؟")) { await deleteDoc(doc(db, "playlists", id)); loadDashboardData(); } }
+        // دالة حذف الدروس
+        window.deleteVideo = async (id) => { 
+            if(confirm("تأكيد حذف الدرس؟")) { 
+                await deleteDoc(doc(db, "playlists", id)); 
+                loadDashboardData(); 
+            } 
+        }
+
+        // دالة حذف نتائج الطلاب (تمت الإضافة)
+        window.deleteResult = async (id) => {
+            if(confirm("هل أنت متأكد من حذف هذه الشهادة/النتيجة؟")) {
+                await deleteDoc(doc(db, "quiz_results", id));
+                loadDashboardData(); // إعادة تحميل البيانات بعد الحذف لتحديث الجدول
+            }
+        }
+
         loadDashboardData();
     </script>
 </body>
