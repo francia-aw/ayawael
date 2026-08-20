@@ -24,7 +24,13 @@
         .remove-q-btn { position: absolute; top: 5px; left: 5px; background: #e53e3e; width: auto; padding: 5px 10px; font-size: 12px; }
         .add-q-btn { background-color: #48bb78; margin-bottom: 20px; }
         .lesson-item { background: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        
+        /* تنسيق أزرار الدروس */
+        .actions-div { display: flex; gap: 5px; }
         .delete-btn { background-color: #e53e3e; width: auto; padding: 8px 15px; margin: 0; }
+        .edit-btn { background-color: #ecc94b; color: #2d3748; width: auto; padding: 8px 15px; margin: 0; }
+        .edit-btn:hover { background-color: #d69e2e; }
+        
         .delete-result-btn { background-color: #e53e3e; padding: 5px 10px; font-size: 12px; border-radius: 5px; width: auto; margin: 0; }
         .logout-btn { background-color: #718096; width: auto; position: absolute; top: 20px; left: 20px; }
         
@@ -61,7 +67,7 @@
                             <th>الدرس</th>
                             <th>الدرجة</th>
                             <th>التاريخ</th>
-                            <th>إجراءات</th> <!-- تمت إضافة هذا العمود -->
+                            <th>إجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="studentsResultsBody">
@@ -105,7 +111,8 @@
     </div>
 
     <script type="module">
-        import { auth, db, collection, addDoc, getDocs, doc, deleteDoc, onAuthStateChanged, signOut } from './firebase-config.js';
+        // لاحظ إضافة updateDoc في السطر التالي
+        import { auth, db, collection, addDoc, getDocs, doc, deleteDoc, updateDoc, onAuthStateChanged, signOut } from './firebase-config.js';
 
         // التأكد من صلاحيات الإدارة
         onAuthStateChanged(auth, (user) => { if (!user || user.email !== "yonisaya123@gmail.com") window.location.href = "courses.html"; });
@@ -157,7 +164,14 @@
             container.innerHTML = "";
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                container.innerHTML += `<div class="lesson-item"><div><h4>${data.title}</h4></div><button class="delete-btn" onclick="deleteVideo('${docSnap.id}')">حذف</button></div>`;
+                container.innerHTML += `
+                <div class="lesson-item">
+                    <div><h4 id="title-${docSnap.id}">${data.title}</h4></div>
+                    <div class="actions-div">
+                        <button class="edit-btn" onclick="editVideoTitle('${docSnap.id}', '${data.title.replace(/'/g, "\\'")}')">تعديل</button>
+                        <button class="delete-btn" onclick="deleteVideo('${docSnap.id}')">حذف</button>
+                    </div>
+                </div>`;
             });
 
             // جلب نتائج الطلاب
@@ -181,12 +195,29 @@
                         <td>${data.lesson_title}</td>
                         <td style="color: green; font-weight: bold;">${data.score} / ${data.total_questions}</td>
                         <td>${date}</td>
-                        <td><button class="delete-result-btn" onclick="deleteResult('${docSnap.id}')">حذف</button></td> <!-- زر حذف النتيجة -->
+                        <td><button class="delete-result-btn" onclick="deleteResult('${docSnap.id}')">حذف</button></td>
                     </tr>
                 `;
             });
         }
         
+        // دالة تعديل اسم الدرس (تمت الإضافة)
+        window.editVideoTitle = async (id, oldTitle) => {
+            const newTitle = prompt("أدخل الاسم الجديد للدرس:", oldTitle);
+            // التأكد من أن المستخدم أدخل اسماً جديداً ولم يضغط على "إلغاء"
+            if (newTitle && newTitle.trim() !== "" && newTitle !== oldTitle) {
+                try {
+                    const docRef = doc(db, "playlists", id);
+                    await updateDoc(docRef, { title: newTitle }); // تحديث الاسم في الداتابيس
+                    alert("تم تعديل الاسم بنجاح!");
+                    loadDashboardData(); // إعادة تحميل البيانات لتحديث الواجهة
+                } catch (error) {
+                    console.error("خطأ في التعديل: ", error);
+                    alert("حدث خطأ أثناء تعديل الاسم.");
+                }
+            }
+        }
+
         // دالة حذف الدروس
         window.deleteVideo = async (id) => { 
             if(confirm("تأكيد حذف الدرس؟")) { 
@@ -195,11 +226,11 @@
             } 
         }
 
-        // دالة حذف نتائج الطلاب (تمت الإضافة)
+        // دالة حذف نتائج الطلاب
         window.deleteResult = async (id) => {
             if(confirm("هل أنت متأكد من حذف هذه الشهادة/النتيجة؟")) {
                 await deleteDoc(doc(db, "quiz_results", id));
-                loadDashboardData(); // إعادة تحميل البيانات بعد الحذف لتحديث الجدول
+                loadDashboardData(); 
             }
         }
 
