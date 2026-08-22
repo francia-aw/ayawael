@@ -103,15 +103,15 @@
 
     <div class="container"><div id="playlistContainer" class="video-grid"></div></div>
 
-<div id="adminLoginModal" class="modal">
+    <div id="adminLoginModal" class="modal">
         <div class="login-modal-content">
             <span class="login-close" id="closeAdminLogin">&times;</span>
-            <h2 style="margin-bottom: 20px; color: #2d3748;">تسجيل الدخول للمنصة</h2>
-            <p style="color: #718096; margin-bottom: 20px;">استخدم حساب جوجل الخاص بك لتسجيل الدخول</p>
-            <button id="adminLoginBtn" style="background-color: #4285F4;">🌐 تسجيل الدخول باستخدام Google</button>
+            <h2 style="margin-bottom: 20px; color: #2d3748;">تسجيل دخول الإدارة</h2>
+            <input type="email" id="adminEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="adminPassword" placeholder="كلمة المرور">
+            <button id="adminLoginBtn">دخول الآن</button>
         </div>
     </div>
-    
 
     <div id="fullPageView" class="full-page-view">
         <div class="fp-header">
@@ -141,7 +141,7 @@
     </div>
 
     <script type="module">
-    import { auth, db, collection, getDocs, query, where, doc, updateDoc, increment, addDoc, googleProvider, signInWithPopup } from './firebase-config.js';
+        import { auth, db, collection, getDocs, query, where, doc, updateDoc, increment, addDoc, signInWithEmailAndPassword } from './firebase-config.js';
 
         const adminLoginModal = document.getElementById("adminLoginModal");
         document.getElementById("openAdminLogin").addEventListener("click", () => {
