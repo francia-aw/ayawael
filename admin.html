@@ -391,13 +391,13 @@ a) va   b) vais   c) vas   صح: a"></textarea>
         });
 
         // ===== استدعاء Groq مع fallback تلقائي بين الموديلات =====
+        // ملاحظة: بنخفي اسم الموديل عن المستخدم عشان نحافظ على هوية keoai
         async function callGroqWithFallback(rawText, onStatusUpdate) {
             let lastError = null;
 
             for (let i = 0; i < GROQ_MODELS.length; i++) {
                 const model = GROQ_MODELS[i];
-                const attempt = i + 1;
-                onStatusUpdate(`keoai بيقرأ النص (محاولة ${attempt}/${GROQ_MODELS.length} — ${model})...`);
+                onStatusUpdate("🤔 keoai بيفكر...");
 
                 try {
                     const response = await fetch(GROQ_API_URL, {
@@ -479,10 +479,10 @@ a) va   b) vais   c) vas   صح: a"></textarea>
 
             const btn = document.getElementById("keoaiGenerateBtn");
             btn.disabled = true;
-            setKeoaiStatus("keoai بيقرأ النص ويرتب الأسئلة دلوقتي...", "loading");
+            setKeoaiStatus("🤔 keoai بيفكر...", "loading");
 
             try {
-                const { content, modelUsed } = await callGroqWithFallback(rawText, setKeoaiStatus);
+                const { content } = await callGroqWithFallback(rawText, setKeoaiStatus);
                 let contentStr = content.trim();
 
                 // محاولة استخراج JSON من النص (لو فيه ```json blocks)
@@ -493,7 +493,7 @@ a) va   b) vais   c) vas   صح: a"></textarea>
                     parsed = JSON.parse(contentStr);
                 } catch (e) {
                     console.error("JSON parse error:", e, "\nRaw content:", contentStr);
-                    throw new Error("keoai رجّع استجابة غير صالحة JSON. حاول تاني. (النص الخام: " + contentStr.substring(0, 100) + "...)");
+                    throw new Error("keoai رجّع استجابة غير صالحة JSON. حاول تاني.");
                 }
 
                 const questions = parsed.questions || parsed.q || (Array.isArray(parsed) ? parsed : []);
@@ -524,7 +524,7 @@ a) va   b) vais   c) vas   صح: a"></textarea>
                 });
 
                 const created = qContainer.children.length;
-                setKeoaiStatus(`✅ keoai جهّز ${created} سؤال اختيار من متعدد! (استُخدم الموديل: ${modelUsed}) تقدر تراجعها وتعدّلها تحت، وبعدين اضغط "نشر الدرس بالأسئلة".`, "success");
+                setKeoaiStatus(`✅ keoai جهّز ${created} سؤال اختيار من متعدد! تقدر تراجعها وتعدّلها تحت، وبعدين اضغط "نشر الدرس بالأسئلة".`, "success");
 
                 // Scroll to questions area
                 setTimeout(() => {
