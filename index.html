@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Français avec Madame Aya — منصة تعلم الفرنسية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* ============ HERO ============ */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            padding: 90px 20px 120px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -40%; left: -10%;
+            width: 60%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 50%);
+            animation: floatBg 14s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; right: 0;
+            height: 60px;
+            background: var(--aya-bg);
+            clip-path: polygon(0 100%, 100% 100%, 100% 0, 50% 60%, 0 0);
+        }
+        @keyframes floatBg {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -40px); }
+        }
+        .hero .badge-top {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .hero h1 {
+            font-size: 58px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 14px rgba(0, 0, 0, 0.3);
+            font-weight: 900;
+            line-height: 1.2;
+        }
+        .hero h1 .accent {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: #fdcb6e;
+        }
+        .hero p {
+            font-size: 21px;
+            margin-bottom: 38px;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0.97;
+            line-height: 1.7;
+        }
+        .hero-cta {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .start-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 17px 44px;
+            font-size: 21px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+            box-shadow: 0 10px 28px rgba(231, 76, 60, 0.45);
+            display: inline-block;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .start-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 14px 35px rgba(231, 76, 60, 0.6);
+        }
+        .start-btn.secondary {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+        .start-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+        }
+
+        /* ============ FEATURES STRIP ============ */
+        .features-strip {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: -70px auto 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+        .feature-chip {
+            background: white;
+            padding: 22px 26px;
+            border-radius: 16px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: bold;
+            color: var(--aya-primary);
+            font-size: 15px;
+            flex: 1;
+            min-width: 220px;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .feature-chip:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.16);
+        }
+        .feature-chip .ico {
+            font-size: 30px;
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f0f4f8, #d5dbdb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============ SECTION SHARED ============ */
+        .section {
+            padding: 70px 20px;
+            text-align: center;
+        }
+        .section-head {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+        .section-head h2 {
+            color: var(--aya-primary);
+            font-size: 36px;
+            margin-bottom: 12px;
+            font-weight: 900;
+        }
+        .section-head .subtitle {
+            color: var(--aya-text-muted);
+            font-size: 17px;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ============ CATEGORIES (GRADE GRID) ============ */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .grade-card {
+            background: white;
+            padding: 26px 22px;
+            border-radius: 16px;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
+            text-decoration: none;
+            color: inherit;
+            transition: 0.3s;
+            border-top: 5px solid var(--aya-blue);
+            position: relative;
+            overflow: hidden;
+            display: block;
+        }
+        .grade-card:nth-child(3n+2) { border-top-color: var(--aya-accent); }
+        .grade-card:nth-child(3n+3) { border-top-color: var(--aya-green); }
+        .grade-card::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -50%;
+            width: 100px; height: 100px;
+            background: radial-gradient(circle, rgba(52, 152, 219, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            transition: 0.4s;
+        }
+        .grade-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.14);
+        }
+        .grade-card:hover::before {
+            transform: scale(2.5);
+        }
+        .grade-card .grade-ico {
+            font-size: 38px;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .grade-card h3 {
+            color: var(--aya-primary);
+            font-size: 17px;
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
+        .grade-card p {
+            color: var(--aya-text-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+        .grade-card .arrow {
+            position: absolute;
+            bottom: 18px; left: 18px;
+            color: var(--aya-blue);
+            font-size: 18px;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .grade-card:hover .arrow {
+            opacity: 1;
+            transform: translateX(-5px);
+        }
+
+        /* ============ FEATURED LESSONS ============ */
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .lesson-card-mini {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+            transition: 0.3s;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid #eee;
+            display: block;
+        }
+        .lesson-card-mini:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.13);
+            border-color: var(--aya-blue);
+        }
+        .lesson-card-mini .thumb {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+        }
+        .lesson-card-mini .info {
+            padding: 16px 18px;
+            text-align: right;
+        }
+        .lesson-card-mini .info h4 {
+            color: var(--aya-primary);
+            font-size: 16px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .lesson-card-mini .meta {
+            font-size: 13px;
+            color: var(--aya-text-muted);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-weight: bold;
+        }
+        .lessons-loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--aya-text-muted);
+        }
+        .lessons-loading .spinner {
+            display: inline-block;
+            width: 36px; height: 36px;
+            border: 4px solid var(--aya-border);
+            border-top-color: var(--aya-blue);
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+            margin-bottom: 12px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ============ HOW IT WORKS ============ */
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .step-box {
+            background: white;
+            padding: 36px 26px;
+            border-radius: 18px;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07);
+            flex: 1;
+            min-width: 260px;
+            max-width: 320px;
+            border-top: 5px solid var(--aya-blue);
+            transition: 0.3s;
+            position: relative;
+        }
+        .step-box:nth-child(2) { border-top-color: #e67e22; }
+        .step-box:nth-child(3) { border-top-color: var(--aya-green); }
+        .step-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.13);
+        }
+        .step-icon {
+            font-size: 38px;
+            margin-bottom: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #eef2f7, #d5dbdb);
+        }
+        .step-box h3 {
+            color: var(--aya-accent);
+            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: 800;
+        }
+        .step-box p {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* ============ STATS STRIP ============ */
+        .stats-strip {
+            background: linear-gradient(135deg, #2c3e50 0%, #1a365d 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+        }
+        .stats-strip .row {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .stats-strip .stat .num {
+            font-size: 46px;
+            font-weight: 900;
+            color: #f5a623;
+            display: block;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .stats-strip .stat .lbl {
+            font-size: 15px;
+            color: #cfd8e8;
+        }
+
+        /* ============ TESTIMONIALS ============ */
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .testimonial-card {
+            background: white;
+            padding: 30px 26px;
+            border-radius: 16px;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
+            border-right: 5px solid var(--aya-blue);
+            position: relative;
+            transition: 0.3s;
+        }
+        .testimonial-card:nth-child(2) { border-right-color: var(--aya-accent); }
+        .testimonial-card:nth-child(3) { border-right-color: var(--aya-green); }
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+        }
+        .testimonial-card .quote-mark {
+            font-size: 50px;
+            color: var(--aya-border);
+            line-height: 0.5;
+            margin-bottom: 8px;
+            font-family: Georgia, serif;
+            display: block;
+        }
+        .testimonial-card p {
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.8;
+            margin-bottom: 18px;
+            font-style: italic;
+        }
+        .testimonial-card .author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .testimonial-card .author-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--aya-blue), #2980b9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+        }
+        .testimonial-card:nth-child(2) .author-avatar {
+            background: linear-gradient(135deg, var(--aya-accent), #c0392b);
+        }
+        .testimonial-card:nth-child(3) .author-avatar {
+            background: linear-gradient(135deg, var(--aya-green), #27ae60);
+        }
+        .testimonial-card .author-info strong {
+            display: block;
+            color: var(--aya-primary);
+            font-size: 15px;
+        }
+        .testimonial-card .author-info span {
+            font-size: 12px;
+            color: var(--aya-text-muted);
+        }
+
+        /* ============ CTA ============ */
+        .cta-section {
+            text-align: center;
+            padding: 70px 20px;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+        .cta-section h2 {
+            color: #2c3e50;
+            font-size: 34px;
+            margin-bottom: 14px;
+            font-weight: 900;
+        }
+        .cta-section p {
+            color: #5a3a1a;
+            font-size: 17px;
+            margin-bottom: 28px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="aya-nav">
+        <a href="index.html" class="aya-logo">🇫🇷 Madame Aya</a>
+        <ul class="aya-nav-links">
+            <li><a href="index.html" class="active">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+            <li><a href="courses.html">المنصة التعليمية</a></li>
+            <li>
+                <select class="aya-lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- بانر واحد فوق الصفحة -->
+    <div class="ad-banner-container">
+        <div data-ad="responsive-top"></div>
+    </div>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+        <span class="badge-top">🎓 منصة تعليمية مجانية بالكامل</span>
+        <h1>طريقك لإتقان <span class="accent">اللغة الفرنسية</span></h1>
+        <p>مرحباً بك في منصة Madame Aya المتكاملة. شروحات تفاعلية، فيديوهات ممتعة، اختبارات ذكية، وشهادات إنجاز معتمدة — كل ده في مكان واحد لكل المراحل الدراسية.</p>
+        <div class="hero-cta">
+            <a href="courses.html" class="start-btn">🚀 ابدأ التعلم الآن</a>
+            <a href="#categories" class="start-btn secondary">📚 تصفّح المراحل</a>
+        </div>
+    </section>
+
+    <!-- ============ FEATURES STRIP ============ -->
+    <div class="features-strip">
+        <div class="feature-chip"><span class="ico">🎓</span> كل المراحل الدراسية</div>
+        <div class="feature-chip"><span class="ico">📺</span> فيديوهات تفاعلية</div>
+        <div class="feature-chip"><span class="ico">🏆</span> شهادات إنجاز معتمدة</div>
+    </div>
+
+    <!-- ============ CATEGORIES / GRADES ============ -->
+    <section class="section" id="categories">
+        <div class="section-head">
+            <h2>📚 اختر مرحلتك الدراسية</h2>
+            <p class="subtitle">من الصف الرابع الابتدائي حتى الثالث الثانوي — كل مرحلة فيها دروس مبنية خصيصاً لمنهجك</p>
+        </div>
+        <div class="categories-grid" id="categoriesGrid">
+            <!-- يُملأ ديناميكياً -->
+        </div>
+    </section>
+
+    <!-- ============ FEATURED LESSONS ============ -->
+    <section class="section" style="background: linear-gradient(180deg, #f4f7f6 0%, #ffffff 100%);">
+        <div class="section-head">
+            <h2>⭐ دروس مميزة</h2>
+            <p class="subtitle">أحدث الدروس وأكثرها مشاهدة على المنصة — ابدأ منها رحلتك التعليمية</p>
+        </div>
+        <div class="featured-grid" id="featuredGrid">
+            <div class="lessons-loading">
+                <div class="spinner"></div>
+                <div>جاري تحميل الدروس المميزة...</div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top: 36px;">
+            <a href="courses.html" class="aya-btn aya-btn-primary">عرض كل الدروس ←</a>
+        </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="section">
+        <div class="section-head">
+            <h2>كيف تبدأ رحلتك؟ 🎯</h2>
+            <p class="subtitle">ثلاث خطوات بسيطة تفصلك عن إتقان اللغة الفرنسية</p>
+        </div>
+        <div class="steps-container">
+            <div class="step-box">
+                <div class="step-icon">1️⃣</div>
+                <h3>اختر مرحلتك</h3>
+                <p>ادخل إلى المنصة التعليمية واختر صفك الدراسي من القائمة لتظهر لك كل الدروس المتاحة لمرحلتك مباشرةً.</p>
+            </div>
+            <div class="step-box">
+                <div class="step-icon">2️⃣</div>
+                <h3>شاهد الدرس</h3>
+                <p>استمتع بشرح تفاعلي وبسيط من خلال فيديوهات قصيرة صُممت خصيصاً لتوصيل المعلومة بأبسط طريقة وفي أقصر وقت.</p>
+            </div>
+            <div class="step-box">
+                <div class="step-icon">3️⃣</div>
+                <h3>اختبر نفسك</h3>
+                <p>بعد كل فيديو، ستجد أسئلة اختبارية لتتأكد من فهمك للدرس، واحصل على شهادتك المعتمدة فور اجتياز 70%.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ STATS ============ -->
+    <section class="stats-strip">
+        <div class="row">
+            <div class="stat">
+                <span class="num" id="statVisitors">0</span>
+                <span class="lbl">زائر الموقع</span>
+            </div>
+            <div class="stat">
+                <span class="num" id="statLessons">0</span>
+                <span class="lbl">درس متاح</span>
+            </div>
+            <div class="stat">
+                <span class="num">9</span>
+                <span class="lbl">مراحل دراسية</span>
+            </div>
+            <div class="stat">
+                <span class="num">100%</span>
+                <span class="lbl">مجاني للجميع</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ TESTIMONIALS ============ -->
+    <section class="section">
+        <div class="section-head">
+            <h2>💬 آراء طلابنا</h2>
+            <p class="subtitle">آلاف الطلاب اختاروا Madame Aya — تعرف على تجربتهم</p>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <span class="quote-mark">"</span>
+                <p>المنصة غيّرت طريقة فهمي للفرنسية تماماً. الشرح بسيط والفيديوهات قصيرة ومركّزة، أخيراً قدرت أفرّق بين الـ genres والـ nombres بسهولة!</p>
+                <div class="author">
+                    <div class="author-avatar">أ</div>
+                    <div class="author-info">
+                        <strong>أحمد محمود</strong>
+                        <span>الصف الثاني الإعدادي</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <span class="quote-mark">"</span>
+                <p>ابنتي كانت بتعاني في الفرنسية، بس بعد ما بدأت تتابع دروس Madame Aya درجاتها اتحسنت جداً. الشهادات بقت حافز ليها تذاكر أكتر. شكراً جزيلاً!</p>
+                <div class="author">
+                    <div class="author-avatar">س</div>
+                    <div class="author-info">
+                        <strong>سلمى عبد الله</strong>
+                        <span>والدة طالبة</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <span class="quote-mark">"</span>
+                <p>كنت حاسس إني ضايع في المنهج، بس الترتيب بتاع الدروس على المنصة خلاني أعرف أبدأ منين وأروح فين. الاختبارات بعد كل درس بتثبت المعلومة فعلاً.</p>
+                <div class="author">
+                    <div class="author-avatar">م</div>
+                    <div class="author-info">
+                        <strong>محمد خالد</strong>
+                        <span>الصف الثالث الثانوي</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ NATIVE AD (واحد بس في الصفحة) ============ -->
+    <div class="ad-banner-container" style="margin: 30px auto;">
+        <div data-ad="native"></div>
+    </div>
+
+    <!-- ============ CTA ============ -->
+    <section class="cta-section">
+        <h2>جاهز لبدء رحلتك التعليمية؟ 🚀</h2>
+        <p>انضم إلى آلاف الطلاب اللي اختاروا منصة Madame Aya لتعلّم اللغة الفرنسية بطريقة عصرية وممتعة وفعّالة.</p>
+        <a href="courses.html" class="start-btn" style="background: linear-gradient(135deg, #2c3e50, #1a365d);">📚 تصفح الدروس الآن</a>
+    </section>
+
+    <div class="keo-footer">
+        <div class="footer-links">
+            <a href="index.html">الرئيسية</a>
+            <a href="about.html">من نحن</a>
+            <a href="contact.html">تواصل معنا</a>
+            <a href="courses.html">المنصة التعليمية</a>
+        </div>
+        Powered by <span class="brand-keo">keo</span><span class="brand-ai">ai</span>
+    </div>
+
+    <!-- إعلانات شاملة: Popunder + Social Bar (مرة واحدة) -->
+    <script src="js/ads.js"></script>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'ar', includedLanguages: 'ar,en,fr', autoDisplay: false }, 'google_translate_element');
+        }
+        function changeLanguage(lang) {
+            var selectField = document.querySelector(".goog-te-combo");
+            if (selectField) { selectField.value = lang; selectField.dispatchEvent(new Event('change')); }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script type="module">
+        import { db, doc, updateDoc, setDoc, getDoc, increment, collection, getDocs } from './firebase-config.js';
+
+        // ====== قائمة المراحل الدراسية ======
+        var GRADES = [
+            { id: '4_primary', label: 'الصف الرابع الابتدائي', ico: '🌱', desc: 'بداية رحلة الفرنسية' },
+            { id: '5_primary', label: 'الصف الخامس الابتدائي', ico: '🌿', desc: 'تعميق الأساسيات' },
+            { id: '6_primary', label: 'الصف السادس الابتدائي', ico: '🌳', desc: 'استعداد للإعدادي' },
+            { id: '1_prep', label: 'الصف الأول الإعدادي', ico: '📘', desc: 'بداية المرحلة الإعدادية' },
+            { id: '2_prep', label: 'الصف الثاني الإعدادي', ico: '📗', desc: 'توسيع القاموس' },
+            { id: '3_prep', label: 'الصف الثالث الإعدادي', ico: '📕', desc: 'استعداد للثانوي' },
+            { id: '1_sec', label: 'الصف الأول الثانوي', ico: '🎓', desc: 'بداية المرحلة الثانوية' },
+            { id: '2_sec', label: 'الصف الثاني الثانوي', ico: '🏆', desc: 'تركيز على المنهج' },
+            { id: '3_sec', label: 'الصف الثالث الثانوي', ico: '⭐', desc: 'المرحلة النهائية' }
+        ];
+
+        function renderCategories() {
+            var grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = GRADES.map(function (g) {
+                return ''
+                    + '<a href="courses.html?grade=' + g.id + '" class="grade-card">'
+                    + '  <span class="grade-ico">' + g.ico + '</span>'
+                    + '  <h3>' + g.label + '</h3>'
+                    + '  <p>' + g.desc + '</p>'
+                    + '  <span class="arrow">←</span>'
+                    + '</a>';
+            }).join('');
+        }
+        renderCategories();
+
+        // ====== تحميل الدروس المميزة (أحدث 6 أو الأكثر مشاهدة) ======
+        function getYouTubeId(url) {
+            if (!url) return '';
+            var vId = '';
+            if (url.indexOf('v=') !== -1) vId = url.split('v=')[1].substring(0, 11);
+            else if (url.indexOf('youtu.be/') !== -1) vId = url.split('youtu.be/')[1].substring(0, 11);
+            return vId;
+        }
+        function escHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function gradeLabel(g) {
+            for (var i = 0; i < GRADES.length; i++) if (GRADES[i].id === g) return GRADES[i].label;
+            return '';
+        }
+
+        async function loadFeaturedLessons() {
+            var grid = document.getElementById('featuredGrid');
+            try {
+                var snap = await getDocs(collection(db, 'playlists'));
+                var arr = [];
+                snap.forEach(function (d) {
+                    var data = d.data();
+                    data._id = d.id;
+                    arr.push(data);
+                });
+                // ترتيب حسب المشاهدات (الأكثر أولاً)
+                arr.sort(function (a, b) { return (b.views || 0) - (a.views || 0); });
+                // أحدث 6 (لو أقل من 6 نعرض الكل)
+                var top = arr.slice(0, 6);
+
+                // تحديث عداد الدروس في strip الإحصائيات
+                var lessonsStat = document.getElementById('statLessons');
+                if (lessonsStat) animateCount(lessonsStat, arr.length);
+
+                if (!top.length) {
+                    grid.innerHTML = '<div class="lessons-loading"><div style="font-size:50px;opacity:0.4;">📚</div><div>سيتم إضافة الدروس قريباً. تابعنا!</div></div>';
+                    return;
+                }
+
+                grid.innerHTML = top.map(function (data) {
+                    var vid = getYouTubeId(data.url);
+                    var thumb = vid ? 'https://img.youtube.com/vi/' + vid + '/hqdefault.jpg' : '';
+                    return ''
+                        + '<a href="lesson.html?id=' + encodeURIComponent(data._id) + '&grade=' + encodeURIComponent(data.grade || '') + '" class="lesson-card-mini">'
+                        + '  <img src="' + thumb + '" class="thumb" alt="" onerror="this.style.display=\'none\'">'
+                        + '  <div class="info">'
+                        + '    <h4>' + escHtml(data.title) + '</h4>'
+                        + '    <div class="meta">'
+                        + '      <span>👁️ ' + (data.views || 0) + '</span>'
+                        + '      <span>👍 ' + (data.likes || 0) + '</span>'
+                        + (data.grade ? '<span>📖 ' + gradeLabel(data.grade) + '</span>' : '')
+                        + '    </div>'
+                        + '  </div>'
+                        + '</a>';
+                }).join('');
+            } catch (err) {
+                console.error(err);
+                grid.innerHTML = '<div class="lessons-loading"><div style="font-size:50px;opacity:0.4;">⚠️</div><div>تعذّر تحميل الدروس الآن. حاول مرة أخرى لاحقاً.</div></div>';
+            }
+        }
+        loadFeaturedLessons();
+
+        // ====== عداد الزوار ======
+        async function trackVisitor() {
+            try {
+                var statsRef = doc(db, 'settings', 'stats');
+                var snap = await getDoc(statsRef);
+                var newCount;
+                if (snap.exists()) {
+                    if (!sessionStorage.getItem('visited_already')) {
+                        await updateDoc(statsRef, { visitors: increment(1) });
+                        newCount = (snap.data().visitors || 0) + 1;
+                    } else {
+                        newCount = snap.data().visitors || 0;
+                    }
+                } else {
+                    await setDoc(statsRef, { visitors: 1 });
+                    newCount = 1;
+                }
+                sessionStorage.setItem('visited_already', 'true');
+                var el = document.getElementById('statVisitors');
+                if (el) animateCount(el, newCount);
+            } catch (e) {
+                console.error('visitor track err:', e);
+                var el2 = document.getElementById('statVisitors');
+                if (el2) animateCount(el2, 1250);
+            }
+        }
+        trackVisitor();
+
+        // ====== عداد متحرك للأرقام ======
+        function animateCount(el, target) {
+            target = parseInt(target, 10) || 0;
+            var start = 0;
+            var dur = 1500;
+            var startTime = null;
+            function step(ts) {
+                if (!startTime) startTime = ts;
+                var p = Math.min((ts - startTime) / dur, 1);
+                // ease-out
+                var eased = 1 - Math.pow(1 - p, 3);
+                var val = Math.floor(start + (target - start) * eased);
+                el.innerText = val.toLocaleString('ar-EG');
+                if (p < 1) requestAnimationFrame(step);
+                else el.innerText = target.toLocaleString('ar-EG');
+            }
+            requestAnimationFrame(step);
+        }
+
+        AdsBoot.init();
+    </script>
+
+</body>
+</html>

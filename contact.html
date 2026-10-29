@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا - Le Français avec Madame Aya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .contact-hero {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-align: center;
+            padding: 80px 20px 70px;
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; left: 0; right: 0;
+            height: 50px;
+            background: var(--aya-bg);
+            clip-path: polygon(0 100%, 100% 100%, 100% 0, 50% 60%, 0 0);
+        }
+        .contact-hero .badge-top {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+        .contact-hero h1 {
+            font-size: 44px;
+            margin-bottom: 12px;
+            font-weight: 900;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+        }
+        .contact-hero p {
+            font-size: 18px;
+            opacity: 0.96;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .contact-container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .contact-container { grid-template-columns: 1fr; }
+        }
+        .contact-info, .contact-form {
+            background: white;
+            padding: 36px;
+            border-radius: 18px;
+            box-shadow: var(--aya-shadow-md);
+            border-top: 5px solid var(--aya-accent);
+        }
+        .contact-form { border-top-color: var(--aya-blue); }
+
+        .contact-info h1, .contact-form h1 {
+            color: var(--aya-primary);
+            margin-bottom: 10px;
+            font-size: 26px;
+            font-weight: 900;
+        }
+        .contact-info > p, .contact-form > p {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 22px;
+            line-height: 1.7;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f8fafc, #eef2f7);
+            padding: 16px 18px;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: 0.25s;
+        }
+        .info-card:hover {
+            transform: translateX(-5px);
+            background: linear-gradient(135deg, #ebf5ff, #d5eaf8);
+        }
+        .info-card .ico {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--aya-blue), #2980b9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .info-card .lbl {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            font-weight: bold;
+        }
+        .info-card .val {
+            font-size: 15px;
+            color: var(--aya-primary);
+            font-weight: bold;
+            direction: ltr;
+            text-align: left;
+        }
+        .info-card .val-rtl { direction: rtl; text-align: right; }
+
+        .social-section { margin-top: 22px; }
+        .social-section h3 {
+            color: var(--aya-primary);
+            font-size: 16px;
+            margin-bottom: 12px;
+            font-weight: 800;
+        }
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 18px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            text-align: right;
+            transition: 0.25s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .social-btn:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 8px 18px rgba(0,0,0,0.15); }
+        .social-btn .ico { font-size: 22px; }
+        .btn-fb { background: linear-gradient(135deg, #1877F2, #0d5fc0); }
+        .btn-yt { background: linear-gradient(135deg, #FF0000, #cc0000); }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 13px 16px;
+            margin-bottom: 14px;
+            border: 2px solid var(--aya-border);
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            font-family: 'Cairo', sans-serif;
+            transition: 0.2s;
+        }
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: var(--aya-blue);
+        }
+        .contact-form textarea {
+            height: 130px;
+            resize: vertical;
+        }
+        .contact-form button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--aya-accent), #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: 'Cairo', sans-serif;
+            box-shadow: 0 4px 12px rgba(231,76,60,0.35);
+        }
+        .contact-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231,76,60,0.5);
+        }
+        #successMessage {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            border: 1px solid #c3e6cb;
+            margin-bottom: 14px;
+        }
+
+        .faq-strip {
+            max-width: 1100px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+        .faq-strip h2 {
+            color: var(--aya-primary);
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 22px;
+            text-align: center;
+        }
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            box-shadow: var(--aya-shadow-sm);
+            border-right: 4px solid var(--aya-blue);
+        }
+        .faq-item h4 {
+            color: var(--aya-primary);
+            font-size: 16px;
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
+        .faq-item p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="aya-nav">
+        <a href="index.html" class="aya-logo">🇫🇷 Madame Aya</a>
+        <ul class="aya-nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="contact.html" class="active">تواصل معنا</a></li>
+            <li><a href="courses.html">المنصة التعليمية</a></li>
+            <li>
+                <select class="aya-lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- بانر واحد فوق الصفحة -->
+    <div class="ad-banner-container">
+        <div data-ad="responsive-top"></div>
+    </div>
+
+    <section class="contact-hero">
+        <span class="badge-top">✉️ نسعد بتواصلك</span>
+        <h1>تواصل معنا</h1>
+        <p>أي استفسار عن الدروس، المنهج، أو الشهادات — احنا هنا علشانك. راسلنا وهنرد عليك في أقرب وقت.</p>
+    </section>
+
+    <div class="contact-container">
+        <div class="contact-form">
+            <h1>إرسال رسالة 📨</h1>
+            <p>املأ النموذج التالي وسنقوم بالرد عليك على بريدك الإلكتروني.</p>
+            <div id="successMessage">✅ تم إرسال رسالتك بنجاح! شكراً لتواصلك معنا. سنرد عليك قريباً.</div>
+            <form id="ajaxContactForm">
+                <input type="text" name="name" id="userName" placeholder="اسمك الكريم" required>
+                <input type="email" name="email" id="userEmail" placeholder="بريدك الإلكتروني" required>
+                <textarea name="message" id="userMessage" placeholder="اكتب رسالتك أو استفسارك هنا..." required></textarea>
+                <button type="submit" id="submitBtn">إرسال الرسالة 📤</button>
+            </form>
+        </div>
+
+        <div class="contact-info">
+            <h1>معلومات التواصل 📱</h1>
+            <p>تقدر توصل معنا عبر القنوات التالية كمان:</p>
+
+            <div class="info-card">
+                <div class="ico">📧</div>
+                <div>
+                    <span class="lbl">البريد الإلكتروني</span>
+                    <span class="val">yonisaya123@gmail.com</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="ico">🌍</div>
+                <div>
+                    <span class="lbl">الموقع الإلكتروني</span>
+                    <span class="val">cafedetouta.online</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="ico">⏰</div>
+                <div>
+                    <span class="lbl">وقت الرد</span>
+                    <span class="val val-rtl">خلال 24-48 ساعة</span>
+                </div>
+            </div>
+
+            <div class="social-section">
+                <h3>تابعنا على</h3>
+                <div class="social-links">
+                    <a href="#" target="_blank" class="social-btn btn-fb">
+                        <span class="ico">📘</span>
+                        <span>صفحتنا على Facebook</span>
+                    </a>
+                    <a href="#" target="_blank" class="social-btn btn-yt">
+                        <span class="ico">▶️</span>
+                        <span>قناتنا على YouTube</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ NATIVE AD (واحد فقط) ============ -->
+    <div class="ad-banner-container" style="margin: 30px auto;">
+        <div data-ad="native"></div>
+    </div>
+
+    <!-- ============ FAQ ============ -->
+    <section class="faq-strip">
+        <h2>❓ الأسئلة الشائعة</h2>
+        <div class="faq-item">
+            <h4>هل المنصة مجانية بالكامل؟</h4>
+            <p>نعم، كل الدروس والاختبارات والشهادات متاحة مجاناً بالكامل لكل الطلاب دون أي رسوم.</p>
+        </div>
+        <div class="faq-item">
+            <h4>كيف أحصل على الشهادة بعد الدرس؟</h4>
+            <p>بعد مشاهدة الفيديو، ادخل بياناتك في بوابة الاختبار وأجب على الأسئلة. لو نسبتك 70% أو أكتر، الشهادة هتظهر فوراً وتقدر تحمّلها.</p>
+        </div>
+        <div class="faq-item">
+            <h4>هل الدروس مرتبة حسب المرحلة الدراسية؟</h4>
+            <p>أيوا، اختر مرحلتك من المنصة التعليمية وهتظهرلك كل الدروس الخاصة بيها. كمان تقدر تبحث عن درس معين بالعنوان.</p>
+        </div>
+        <div class="faq-item">
+            <h4>هل أقدر أعلّق على الدروس؟</h4>
+            <p>أيوا، كل درس ليه صفحة مستقلة فيها نظام تعليقات. تقدر تسأل أو تشارك ملاحظاتك مع باقي الطلاب والمدرّسة.</p>
+        </div>
+    </section>
+
+    <div class="keo-footer">
+        <div class="footer-links">
+            <a href="index.html">الرئيسية</a>
+            <a href="about.html">من نحن</a>
+            <a href="contact.html">تواصل معنا</a>
+            <a href="courses.html">المنصة التعليمية</a>
+        </div>
+        Powered by <span class="brand-keo">keo</span><span class="brand-ai">ai</span>
+    </div>
+
+    <script src="js/ads.js"></script>
+    <script>
+        AdsBoot.init();
+
+        document.getElementById('ajaxContactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var btn = document.getElementById('submitBtn');
+            btn.innerText = "جاري الإرسال... ⏳";
+            btn.disabled = true;
+
+            var formData = new FormData();
+            formData.append('name', document.getElementById('userName').value);
+            formData.append('email', document.getElementById('userEmail').value);
+            formData.append('message', document.getElementById('userMessage').value);
+            formData.append('_subject', 'رسالة جديدة من منصة Madame Aya');
+
+            fetch("https://formsubmit.co/ajax/yonisaya123@gmail.com", {
+                method: "POST", body: formData
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                document.getElementById('ajaxContactForm').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+            })
+            .catch(function(error) {
+                alert("حدث خطأ أثناء الإرسال، حاول مرة أخرى.");
+                btn.innerText = "إرسال الرسالة 📤";
+                btn.disabled = false;
+            });
+        });
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'ar', includedLanguages: 'ar,en,fr', autoDisplay: false }, 'google_translate_element');
+        }
+        function changeLanguage(lang) {
+            var selectField = document.querySelector(".goog-te-combo");
+            if (selectField) { selectField.value = lang; selectField.dispatchEvent(new Event('change')); }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
