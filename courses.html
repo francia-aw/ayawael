@@ -38,10 +38,13 @@
         .video-stats-small { font-size: 15px; color: #7f8c8d; font-weight: bold; }
 
         .full-page-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #f8fbff; z-index: 2000; overflow-y: auto; padding-bottom: 80px; }
-        .fp-header { background: #2c3e50; color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2001; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .fp-header { background: #2c3e50; color: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 2001; box-shadow: 0 4px 10px rgba(0,0,0,0.2); flex-wrap: wrap; gap: 15px; }
         .fp-header h2 { font-size: 24px; margin: 0; }
+        .fp-header-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
         .fp-header button { background: #e74c3c; color: white; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.3s; }
         .fp-header button:hover { background: #c0392b; transform: scale(1.05); }
+        .share-btn { background: #3498db !important; }
+        .share-btn:hover { background: #2980b9 !important; }
         .fp-content { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
         
         .fp-video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #fff; }
@@ -86,6 +89,9 @@
         }
         .keo-footer .brand-keo { color: #e94560; font-weight: bold; }
         .keo-footer .brand-ai { color: #f5a623; font-weight: bold; }
+        
+        .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #27ae60; color: white; padding: 15px 30px; border-radius: 10px; font-size: 18px; font-weight: bold; z-index: 4000; box-shadow: 0 5px 20px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+        .toast-msg.show { opacity: 1; }
     </style>
 </head>
 <body>
@@ -128,7 +134,10 @@
     <div id="fullPageView" class="full-page-view">
         <div class="fp-header">
             <h2 id="fpTitle">عنوان الدرس</h2>
-            <button id="closeFpBtn">⬅️ إغلاق والعودة للمنصة</button>
+            <div class="fp-header-buttons">
+                <button id="shareLessonBtn" class="share-btn">🔗 مشاركة رابط الدرس</button>
+                <button id="closeFpBtn">⬅️ إغلاق والعودة للمنصة</button>
+            </div>
         </div>
         <div class="fp-content">
             <div class="fp-video-container"><iframe id="fpVideoPlayer" src="" allowfullscreen></iframe></div>
@@ -152,14 +161,18 @@
         </div>
     </div>
 
+    <div id="toastMsg" class="toast-msg"></div>
+
     <div class="keo-footer">
         Powered by <span class="brand-keo">keo</span><span class="brand-ai">ai</span>
     </div>
 
     <script type="module">
-        import { auth, db, collection, getDocs, query, where, doc, updateDoc, increment, addDoc, signInWithEmailAndPassword } from './firebase-config.js';
+        import { auth, db, collection, getDocs, getDoc, query, where, doc, updateDoc, increment, addDoc, signInWithEmailAndPassword } from './firebase-config.js';
 
         const adminLoginModal = document.getElementById("adminLoginModal");
+        let currentVideoId = null;
+
         document.getElementById("openAdminLogin").addEventListener("click", () => {
             if (auth.currentUser && auth.currentUser.email === "yonisaya123@gmail.com") window.location.href = "admin.html";
             else adminLoginModal.style.display = "flex";
@@ -181,7 +194,246 @@
             return vId;
         }
 
-        let currentVideoId = null;
+        // رسالة منبثقة سريعة (Toast)
+        function showToast(message) {
+            const toast = document.getElementById("toastMsg");
+            toast.innerText = message;
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
+        }
+
+        // ===== دالة موحدة لفتح أي درس (تُستخدم عند الضغط على الكارت أو عند فتح رابط مباشر) =====
+        async function openLesson(docId, data) {
+            currentVideoId = docId;
+            const videoId = getYouTubeId(data.url);
+
+            document.getElementById("fpTitle").innerText = data.title;
+            document.getElementById("fpVideoTitleDown").innerText = data.title;
+            document.getElementById("fpVideoPlayer").src = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : data.url;
+            
+            document.getElementById("fpViews").innerText = (data.views || 0) + 1;
+            document.getElementById("fpLikes").innerText = data.likes || 0;
+            await updateDoc(doc(db, "playlists", docId), { views: increment(1) });
+
+            // إعادة تفعيل زر الإعجاب لكل درس جديد
+            const likeBtn = document.getElementById("fpLikeBtn");
+            likeBtn.disabled = false;
+            likeBtn.style.backgroundColor = "#e74c3c";
+            likeBtn.style.boxShadow = "0 4px 10px rgba(231,76,60,0.3)";
+            likeBtn.innerHTML = '👍 أعجبني <span id="fpLikes">' + (data.likes || 0) + '</span>';
+
+            const gateArea = document.getElementById("studentGateArea");
+            const qArea = document.getElementById("fpQuestionsArea");
+            const resArea = document.getElementById("finalResultArea");
+            
+            gateArea.innerHTML = "";
+            qArea.innerHTML = "";
+            resArea.innerHTML = "";
+            qArea.style.display = "none";
+
+            let currentScore = 0;
+            let totalQs = 0;
+            let answeredCount = 0;
+
+            if (data.questions && data.questions.length > 0) {
+                totalQs = data.questions.length;
+                
+                gateArea.innerHTML = `
+                    <div class="student-gate">
+                        <h3>📝 اختبر نفسك واستلم شهادتك</h3>
+                        <p>الرجاء إدخال بياناتك لفتح أسئلة الدرس (يجب الحصول على 70% لاستلام الشهادة)</p>
+                        <input type="text" id="tempName" class="gate-input" placeholder="الاسم (كما سيظهر في الشهادة)"><br>
+                        <input type="email" id="tempEmail" class="gate-input" placeholder="البريد الإلكتروني"><br>
+                        <button id="openExamBtn" class="gate-btn">ابدأ الاختبار الآن 🚀</button>
+                    </div>
+                `;
+
+                document.getElementById("openExamBtn").addEventListener("click", () => {
+                    const finalName = document.getElementById("tempName").value.trim();
+                    const finalEmail = document.getElementById("tempEmail").value.trim();
+                    
+                    if(!finalName || !finalEmail) {
+                        alert("يجب إدخال الاسم والإيميل لفتح الامتحان!");
+                        return;
+                    }
+
+                    gateArea.innerHTML = "";
+                    qArea.style.display = "block";
+                    qArea.innerHTML = "<h2 class='exam-title'>بالتوفيق يا " + finalName + " 🎯</h2>";
+
+                    data.questions.forEach((qObj, index) => {
+                        const qDiv = document.createElement("div");
+                        qDiv.className = "single-question";
+                        qDiv.setAttribute("data-answered", "false");
+                        qDiv.innerHTML = `
+                            <h3>السؤال ${index + 1}: ${qObj.q}</h3>
+                            <div class="options-box"></div>
+                            <p class="feedback-msg"></p>
+                        `;
+                        const optsBox = qDiv.querySelector('.options-box');
+                        const feedback = qDiv.querySelector('.feedback-msg');
+                        
+                        [qObj.opt1, qObj.opt2, qObj.opt3].forEach((optText, optIndex) => {
+                            if(optText) {
+                                const btn = document.createElement("button");
+                                btn.className = "option-btn";
+                                btn.innerText = optText;
+                                btn.onclick = async () => {
+                                    if (qDiv.getAttribute("data-answered") === "false") {
+                                        qDiv.setAttribute("data-answered", "true");
+                                        answeredCount++;
+                                    }
+
+                                    optsBox.querySelectorAll('button').forEach(b => {
+                                        b.disabled = true; b.style.cursor = "not-allowed"; b.style.opacity = "0.6";
+                                    });
+                                    btn.style.opacity = "1"; 
+                                    
+                                    if ((optIndex + 1).toString() === qObj.correct) {
+                                        btn.style.backgroundColor = "#d4edda"; btn.style.borderColor = "#28a745"; btn.style.color = "#155724";
+                                        feedback.innerText = "✅ إجابة صحيحة!"; feedback.style.color = "#27ae60"; feedback.style.backgroundColor = "#e8f8f5";
+                                        currentScore++;
+                                    } else {
+                                        btn.style.backgroundColor = "#f8d7da"; btn.style.borderColor = "#dc3545"; btn.style.color = "#721c24";
+                                        feedback.innerText = "❌ إجابة خاطئة، الصحيح هو: (" + [qObj.opt1, qObj.opt2, qObj.opt3][parseInt(qObj.correct)-1] + ")"; 
+                                        feedback.style.color = "#c0392b"; feedback.style.backgroundColor = "#fdedf0";
+                                    }
+
+                                    if (answeredCount === totalQs) {
+                                        const percentage = (currentScore / totalQs) * 100;
+                                        
+                                        await addDoc(collection(db, "quiz_results"), {
+                                            lesson_title: data.title, student_name: finalName, student_email: finalEmail,
+                                            score: currentScore, total_questions: totalQs, timestamp: new Date().toISOString()
+                                        });
+
+                                        if (percentage >= 70) {
+                                            const canvas = document.createElement("canvas");
+                                            canvas.width = 1000; canvas.height = 700;
+                                            const ctx = canvas.getContext("2d");
+
+                                            const grd = ctx.createLinearGradient(0, 0, 1000, 700);
+                                            grd.addColorStop(0, "#ffffff");
+                                            grd.addColorStop(1, "#f4f7f9");
+                                            ctx.fillStyle = grd;
+                                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                                            ctx.strokeStyle = "#1a365d"; ctx.lineWidth = 15; 
+                                            ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+                                            ctx.strokeStyle = "#d4af37"; ctx.lineWidth = 4; 
+                                            ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
+                                            
+                                            ctx.fillStyle = "#d4af37";
+                                            ctx.fillRect(45, 45, 40, 6); ctx.fillRect(45, 45, 6, 40);
+                                            ctx.fillRect(canvas.width - 85, 45, 40, 6); ctx.fillRect(canvas.width - 51, 45, 6, 40);
+                                            ctx.fillRect(45, canvas.height - 51, 40, 6); ctx.fillRect(45, canvas.height - 85, 6, 40);
+                                            ctx.fillRect(canvas.width - 85, canvas.height - 51, 40, 6); ctx.fillRect(canvas.width - 51, canvas.height - 85, 6, 40);
+
+                                            ctx.textAlign = "center";
+                                            
+                                            ctx.font = "italic 32px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#d4af37";
+                                            ctx.fillText("Le Français avec Madame Aya", canvas.width / 2, 120);
+
+                                            ctx.font = "bold 42px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
+                                            ctx.fillText("CERTIFICAT DE RÉUSSITE", canvas.width / 2, 200, 750);
+                                            
+                                            ctx.beginPath(); ctx.moveTo(canvas.width/2 - 150, 230); ctx.lineTo(canvas.width/2 + 150, 230);
+                                            ctx.strokeStyle = "#d4af37"; ctx.lineWidth = 2; ctx.stroke();
+
+                                            ctx.font = "italic 26px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#4a5568";
+                                            ctx.fillText("Décerné avec fierté à :", canvas.width / 2, 280);
+
+                                            ctx.font = "bold 60px 'Cairo', sans-serif"; ctx.fillStyle = "#e53e3e";
+                                            ctx.fillText(finalName, canvas.width / 2, 350, 750);
+
+                                            ctx.font = "italic 24px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#4a5568";
+                                            ctx.fillText("Pour avoir suivi et validé avec succès le cours :", canvas.width / 2, 420);
+
+                                            ctx.font = "bold 38px 'Cairo', sans-serif"; ctx.fillStyle = "#2b6cb0";
+                                            ctx.fillText(data.title, canvas.width / 2, 470, 750);
+
+                                            const finalizeAndShow = (finalCertData) => {
+                                                emailjs.init("UiYPZxZVHrQIg8xQq"); 
+                                                const templateParams = {
+                                                    to_name: finalName, 
+                                                    to_email: finalEmail, 
+                                                    lesson_name: data.title,
+                                                    student_score: currentScore + " / " + totalQs
+                                                };
+                                                emailjs.send("service_i5eekp6", "template_6hd8s0v", templateParams).catch(err => console.log(err));
+
+                                                resArea.innerHTML = `
+                                                    <div style="text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #27ae60;">
+                                                        <h2 style="color:#27ae60; font-size: 32px; margin-bottom: 15px; font-weight: 900;">Félicitations ! (النتيجة: ${Math.round(percentage)}%) 🎉</h2>
+                                                        <p style="font-size: 18px; color:#555; margin-bottom:20px;">تم إرسال نتيجتك لبريدك الإلكتروني. تفضل شهادة التفوق الخاصة بك:</p>
+                                                        <img src="${finalCertData}" style="max-width: 100%; border-radius: 10px; border: 5px solid #1a365d; box-shadow: 0 15px 30px rgba(0,0,0,0.2); margin-bottom: 20px;">
+                                                        <br>
+                                                        <a href="${finalCertData}" download="Certificat_${finalName}.jpg" style="background: linear-gradient(135deg, #1a365d, #2b6cb0); color:white; padding:15px 35px; font-size: 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; box-shadow: 0 5px 15px rgba(43, 108, 176, 0.4); transition: 0.3s;">📥 Télécharger le certificat</a>
+                                                    </div>
+                                                `;
+                                                resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                            };
+
+                                            const sealImg = new Image();
+                                            sealImg.src = 'preview.png';
+                                            
+                                            sealImg.onload = () => {
+                                                ctx.drawImage(sealImg, canvas.width / 2 - 90, 485, 180, 180);
+
+                                                const today = new Date().toLocaleDateString('fr-FR');
+                                                ctx.font = "bold 22px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
+                                                ctx.textAlign = "left";
+                                                ctx.fillText("Date : " + today, 100, 600);
+                                                
+                                                ctx.textAlign = "right";
+                                                ctx.fillText("Professeure :", canvas.width - 100, 580);
+                                                ctx.font = "italic 20px 'Georgia', 'Times New Roman', serif";
+                                                ctx.fillText("Madame Aya Wael", canvas.width - 100, 615);
+
+                                                const finalCertificate = canvas.toDataURL("image/jpeg", 0.9);
+                                                finalizeAndShow(finalCertificate);
+                                            };
+
+                                            sealImg.onerror = () => {
+                                                const today = new Date().toLocaleDateString('fr-FR');
+                                                ctx.font = "bold 24px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
+                                                ctx.textAlign = "left";
+                                                ctx.fillText("Date : " + today, 100, 600);
+                                                ctx.textAlign = "right";
+                                                ctx.fillText("Professeure : Madame Aya Wael", canvas.width - 100, 600);
+
+                                                const finalCertificate = canvas.toDataURL("image/jpeg", 0.9);
+                                                finalizeAndShow(finalCertificate);
+                                            };
+
+                                        } else {
+                                            resArea.innerHTML = `
+                                                <div style="text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #e74c3c;">
+                                                    <h2 style="color:#e74c3c; font-size: 32px; margin-bottom: 15px; font-weight: 900;">النتيجة: ${Math.round(percentage)}% 📉</h2>
+                                                    <p style="font-size: 20px; color:#2c3e50; font-weight:bold;">حاول مرة أخرى يا بطل! 💪</p>
+                                                    <p style="font-size: 18px; color:#7f8c8d; margin-top:10px;">للحصول على الشهادة يجب أن تكون نسبة إجاباتك الصحيحة 70% أو أكثر. شاهد الفيديو بتركيز وجرب الاختبار مرة ثانية.</p>
+                                                </div>
+                                            `;
+                                            resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }
+                                    }
+                                };
+                                optsBox.appendChild(btn);
+                            }
+                        });
+                        qArea.appendChild(qDiv);
+                    });
+                });
+            }
+            
+            document.getElementById("fullPageView").style.display = "block";
+            document.body.style.overflow = "hidden";
+
+            // تحديث رابط المتصفح ليصبح رابطاً خاصاً بهذا الدرس (قابل للمشاركة)
+            const url = new URL(window.location.href);
+            url.searchParams.set("lesson", docId);
+            window.history.pushState({ lessonId: docId }, data.title, url.toString());
+        }
 
         document.getElementById("fetchVideosBtn").addEventListener("click", async () => {
             const selectedGrade = document.getElementById("gradeSelect").value;
@@ -216,234 +468,7 @@
                         </div>
                     `;
                     
-                    card.addEventListener("click", async () => {
-                        currentVideoId = docId;
-                        document.getElementById("fpTitle").innerText = data.title;
-                        document.getElementById("fpVideoTitleDown").innerText = data.title;
-                        document.getElementById("fpVideoPlayer").src = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : data.url;
-                        
-                        document.getElementById("fpViews").innerText = (data.views || 0) + 1;
-                        document.getElementById("fpLikes").innerText = data.likes || 0;
-                        await updateDoc(doc(db, "playlists", docId), { views: increment(1) });
-
-                        const gateArea = document.getElementById("studentGateArea");
-                        const qArea = document.getElementById("fpQuestionsArea");
-                        const resArea = document.getElementById("finalResultArea");
-                        
-                        gateArea.innerHTML = "";
-                        qArea.innerHTML = "";
-                        resArea.innerHTML = "";
-                        qArea.style.display = "none";
-
-                        let currentScore = 0;
-                        let totalQs = 0;
-                        let answeredCount = 0;
-
-                        if (data.questions && data.questions.length > 0) {
-                            totalQs = data.questions.length;
-                            
-                            gateArea.innerHTML = `
-                                <div class="student-gate">
-                                    <h3>📝 اختبر نفسك واستلم شهادتك</h3>
-                                    <p>الرجاء إدخال بياناتك لفتح أسئلة الدرس (يجب الحصول على 70% لاستلام الشهادة)</p>
-                                    <input type="text" id="tempName" class="gate-input" placeholder="الاسم (كما سيظهر في الشهادة)"><br>
-                                    <input type="email" id="tempEmail" class="gate-input" placeholder="البريد الإلكتروني"><br>
-                                    <button id="openExamBtn" class="gate-btn">ابدأ الاختبار الآن 🚀</button>
-                                </div>
-                            `;
-
-                            document.getElementById("openExamBtn").addEventListener("click", () => {
-                                const finalName = document.getElementById("tempName").value.trim();
-                                const finalEmail = document.getElementById("tempEmail").value.trim();
-                                
-                                if(!finalName || !finalEmail) {
-                                    alert("يجب إدخال الاسم والإيميل لفتح الامتحان!");
-                                    return;
-                                }
-
-                                gateArea.innerHTML = "";
-                                qArea.style.display = "block";
-                                qArea.innerHTML = "<h2 class='exam-title'>بالتوفيق يا " + finalName + " 🎯</h2>";
-
-                                data.questions.forEach((qObj, index) => {
-                                    const qDiv = document.createElement("div");
-                                    qDiv.className = "single-question";
-                                    qDiv.setAttribute("data-answered", "false");
-                                    qDiv.innerHTML = `
-                                        <h3>السؤال ${index + 1}: ${qObj.q}</h3>
-                                        <div class="options-box"></div>
-                                        <p class="feedback-msg"></p>
-                                    `;
-                                    const optsBox = qDiv.querySelector('.options-box');
-                                    const feedback = qDiv.querySelector('.feedback-msg');
-                                    
-                                    [qObj.opt1, qObj.opt2, qObj.opt3].forEach((optText, optIndex) => {
-                                        if(optText) {
-                                            const btn = document.createElement("button");
-                                            btn.className = "option-btn";
-                                            btn.innerText = optText;
-                                            btn.onclick = async () => {
-                                                if (qDiv.getAttribute("data-answered") === "false") {
-                                                    qDiv.setAttribute("data-answered", "true");
-                                                    answeredCount++;
-                                                }
-
-                                                optsBox.querySelectorAll('button').forEach(b => {
-                                                    b.disabled = true; b.style.cursor = "not-allowed"; b.style.opacity = "0.6";
-                                                });
-                                                btn.style.opacity = "1"; 
-                                                
-                                                if ((optIndex + 1).toString() === qObj.correct) {
-                                                    btn.style.backgroundColor = "#d4edda"; btn.style.borderColor = "#28a745"; btn.style.color = "#155724";
-                                                    feedback.innerText = "✅ إجابة صحيحة!"; feedback.style.color = "#27ae60"; feedback.style.backgroundColor = "#e8f8f5";
-                                                    currentScore++;
-                                                } else {
-                                                    btn.style.backgroundColor = "#f8d7da"; btn.style.borderColor = "#dc3545"; btn.style.color = "#721c24";
-                                                    feedback.innerText = "❌ إجابة خاطئة، الصحيح هو: (" + [qObj.opt1, qObj.opt2, qObj.opt3][parseInt(qObj.correct)-1] + ")"; 
-                                                    feedback.style.color = "#c0392b"; feedback.style.backgroundColor = "#fdedf0";
-                                                }
-
-                                                if (answeredCount === totalQs) {
-                                                    const percentage = (currentScore / totalQs) * 100;
-                                                    
-                                                    await addDoc(collection(db, "quiz_results"), {
-                                                        lesson_title: data.title, student_name: finalName, student_email: finalEmail,
-                                                        score: currentScore, total_questions: totalQs, timestamp: new Date().toISOString()
-                                                    });
-
-                                                    if (percentage >= 70) {
-                                                        const canvas = document.createElement("canvas");
-                                                        canvas.width = 1000; canvas.height = 700;
-                                                        const ctx = canvas.getContext("2d");
-
-                                                        // خلفية الشهادة
-                                                        const grd = ctx.createLinearGradient(0, 0, 1000, 700);
-                                                        grd.addColorStop(0, "#ffffff");
-                                                        grd.addColorStop(1, "#f4f7f9");
-                                                        ctx.fillStyle = grd;
-                                                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                                                        // الإطارات
-                                                        ctx.strokeStyle = "#1a365d"; ctx.lineWidth = 15; 
-                                                        ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
-                                                        ctx.strokeStyle = "#d4af37"; ctx.lineWidth = 4; 
-                                                        ctx.strokeRect(55, 55, canvas.width - 110, canvas.height - 110);
-                                                        
-                                                        // الأركان
-                                                        ctx.fillStyle = "#d4af37";
-                                                        ctx.fillRect(45, 45, 40, 6); ctx.fillRect(45, 45, 6, 40);
-                                                        ctx.fillRect(canvas.width - 85, 45, 40, 6); ctx.fillRect(canvas.width - 51, 45, 6, 40);
-                                                        ctx.fillRect(45, canvas.height - 51, 40, 6); ctx.fillRect(45, canvas.height - 85, 6, 40);
-                                                        ctx.fillRect(canvas.width - 85, canvas.height - 51, 40, 6); ctx.fillRect(canvas.width - 51, canvas.height - 85, 6, 40);
-
-                                                        ctx.textAlign = "center";
-                                                        
-                                                        // عنوان الموقع
-                                                        ctx.font = "italic 32px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#d4af37";
-                                                        ctx.fillText("Le Français avec Madame Aya", canvas.width / 2, 120);
-
-                                                        // العنوان الرئيسي (تم التصغير والحد الأقصى للعرض)
-                                                        ctx.font = "bold 42px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
-                                                        ctx.fillText("CERTIFICAT DE RÉUSSITE", canvas.width / 2, 200, 750);
-                                                        
-                                                        // خط فاصل
-                                                        ctx.beginPath(); ctx.moveTo(canvas.width/2 - 150, 230); ctx.lineTo(canvas.width/2 + 150, 230);
-                                                        ctx.strokeStyle = "#d4af37"; ctx.lineWidth = 2; ctx.stroke();
-
-                                                        // مهداة إلى
-                                                        ctx.font = "italic 26px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#4a5568";
-                                                        ctx.fillText("Décerné avec fierté à :", canvas.width / 2, 280);
-
-                                                        // اسم الطالب (استخدام خط Cairo لدعم العربية بشكل احترافي مع حد أقصى)
-                                                        ctx.font = "bold 60px 'Cairo', sans-serif"; ctx.fillStyle = "#e53e3e";
-                                                        ctx.fillText(finalName, canvas.width / 2, 350, 750);
-
-                                                        // النص الفرنسي
-                                                        ctx.font = "italic 24px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#4a5568";
-                                                        ctx.fillText("Pour avoir suivi et validé avec succès le cours :", canvas.width / 2, 420);
-
-                                                        // اسم الكورس (استخدام Cairo كخط أساسي لتجنب تقطيع الحروف العربية مع حد أقصى)
-                                                        ctx.font = "bold 38px 'Cairo', sans-serif"; ctx.fillStyle = "#2b6cb0";
-                                                        ctx.fillText(data.title, canvas.width / 2, 470, 750);
-
-                                                        const finalizeAndShow = (finalCertData) => {
-                                                            emailjs.init("UiYPZxZVHrQIg8xQq"); 
-                                                            const templateParams = {
-                                                                to_name: finalName, 
-                                                                to_email: finalEmail, 
-                                                                lesson_name: data.title,
-                                                                student_score: currentScore + " / " + totalQs
-                                                            };
-                                                            emailjs.send("service_i5eekp6", "template_6hd8s0v", templateParams).catch(err => console.log(err));
-
-                                                            resArea.innerHTML = `
-                                                                <div style="text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #27ae60;">
-                                                                    <h2 style="color:#27ae60; font-size: 32px; margin-bottom: 15px; font-weight: 900;">Félicitations ! (النتيجة: ${Math.round(percentage)}%) 🎉</h2>
-                                                                    <p style="font-size: 18px; color:#555; margin-bottom:20px;">تم إرسال نتيجتك لبريدك الإلكتروني. تفضل شهادة التفوق الخاصة بك:</p>
-                                                                    <img src="${finalCertData}" style="max-width: 100%; border-radius: 10px; border: 5px solid #1a365d; box-shadow: 0 15px 30px rgba(0,0,0,0.2); margin-bottom: 20px;">
-                                                                    <br>
-                                                                    <a href="${finalCertData}" download="Certificat_${finalName}.jpg" style="background: linear-gradient(135deg, #1a365d, #2b6cb0); color:white; padding:15px 35px; font-size: 20px; border-radius:10px; text-decoration:none; font-weight:bold; display:inline-block; box-shadow: 0 5px 15px rgba(43, 108, 176, 0.4); transition: 0.3s;">📥 Télécharger le certificat</a>
-                                                                </div>
-                                                            `;
-                                                            resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                                        };
-
-                                                        // إضافة الصورة والتواريخ
-                                                        const sealImg = new Image();
-                                                        sealImg.src = 'preview.png';
-                                                        
-                                                        sealImg.onload = () => {
-                                                            ctx.drawImage(sealImg, canvas.width / 2 - 90, 485, 180, 180);
-
-                                                            const today = new Date().toLocaleDateString('fr-FR');
-                                                            ctx.font = "bold 22px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
-                                                            ctx.textAlign = "left";
-                                                            ctx.fillText("Date : " + today, 100, 600);
-                                                            
-                                                            ctx.textAlign = "right";
-                                                            ctx.fillText("Professeure :", canvas.width - 100, 580);
-                                                            ctx.font = "italic 20px 'Georgia', 'Times New Roman', serif";
-                                                            ctx.fillText("Madame Aya Wael", canvas.width - 100, 615);
-
-                                                            const finalCertificate = canvas.toDataURL("image/jpeg", 0.9);
-                                                            finalizeAndShow(finalCertificate);
-                                                        };
-
-                                                        sealImg.onerror = () => {
-                                                            const today = new Date().toLocaleDateString('fr-FR');
-                                                            ctx.font = "bold 24px 'Georgia', 'Times New Roman', serif"; ctx.fillStyle = "#1a365d";
-                                                            ctx.textAlign = "left";
-                                                            ctx.fillText("Date : " + today, 100, 600);
-                                                            ctx.textAlign = "right";
-                                                            ctx.fillText("Professeure : Madame Aya Wael", canvas.width - 100, 600);
-
-                                                            const finalCertificate = canvas.toDataURL("image/jpeg", 0.9);
-                                                            finalizeAndShow(finalCertificate);
-                                                        };
-
-                                                    } else {
-                                                        resArea.innerHTML = `
-                                                            <div style="text-align: center; margin-top: 40px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #e74c3c;">
-                                                                <h2 style="color:#e74c3c; font-size: 32px; margin-bottom: 15px; font-weight: 900;">النتيجة: ${Math.round(percentage)}% 📉</h2>
-                                                                <p style="font-size: 20px; color:#2c3e50; font-weight:bold;">حاول مرة أخرى يا بطل! 💪</p>
-                                                                <p style="font-size: 18px; color:#7f8c8d; margin-top:10px;">للحصول على الشهادة يجب أن تكون نسبة إجاباتك الصحيحة 70% أو أكثر. شاهد الفيديو بتركيز وجرب الاختبار مرة ثانية.</p>
-                                                            </div>
-                                                        `;
-                                                        resArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                                    }
-                                                }
-                                            };
-                                            optsBox.appendChild(btn);
-                                        }
-                                    });
-                                    qArea.appendChild(qDiv);
-                                });
-                            });
-                        }
-                        
-                        document.getElementById("fullPageView").style.display = "block";
-                        document.body.style.overflow = "hidden"; 
-                    });
+                    card.addEventListener("click", () => openLesson(docId, data));
                     container.appendChild(card);
                 });
             } catch (error) { console.error(error); }
@@ -459,12 +484,80 @@
             await updateDoc(doc(db, "playlists", currentVideoId), { likes: increment(1) });
         });
 
-        document.getElementById("closeFpBtn").addEventListener("click", () => {
+        // ===== زر مشاركة رابط الدرس =====
+        document.getElementById("shareLessonBtn").addEventListener("click", async () => {
+            const shareUrl = window.location.href;
+            const lessonTitle = document.getElementById("fpTitle").innerText;
+            try {
+                if (navigator.share) {
+                    // الجوال: يفتح نافذة المشاركة الأصلية (واتساب/فيسبوك/تيليجرام...)
+                    await navigator.share({ title: lessonTitle, text: "درس جديد: " + lessonTitle, url: shareUrl });
+                } else {
+                    // الكمبيوتر: ينسخ الرابط للحافظة
+                    await navigator.clipboard.writeText(shareUrl);
+                    showToast("✅ تم نسخ رابط الدرس للحافظة!");
+                }
+            } catch (err) {
+                // fallback أخير
+                try {
+                    await navigator.clipboard.writeText(shareUrl);
+                    showToast("✅ تم نسخ رابط الدرس!");
+                } catch (e) {
+                    prompt("انسخ هذا الرابط لمشاركة الدرس:", shareUrl);
+                }
+            }
+        });
+
+        // ===== إغلاق الدرس واستعادة الرابط الأصلي =====
+        function closeLesson() {
             document.getElementById("fullPageView").style.display = "none";
             document.getElementById("fpVideoPlayer").src = ""; 
             document.body.style.overflow = "auto"; 
             currentVideoId = null;
+
+            // إزالة ?lesson= من الرابط بعد الإغلاق
+            const url = new URL(window.location.href);
+            if (url.searchParams.has("lesson")) {
+                url.searchParams.delete("lesson");
+                window.history.pushState({}, "", url.toString());
+            }
+        }
+        document.getElementById("closeFpBtn").addEventListener("click", closeLesson);
+
+        // ===== معالجة زر الرجوع في المتصفح (Back) =====
+        window.addEventListener("popstate", () => {
+            const fpv = document.getElementById("fullPageView");
+            if (fpv.style.display === "block") {
+                fpv.style.display = "none";
+                document.getElementById("fpVideoPlayer").src = "";
+                document.body.style.overflow = "auto";
+                currentVideoId = null;
+            }
         });
+
+        // ===== فتح الدرس تلقائياً عند زيارة رابط مباشر يحتوي على ?lesson=ID =====
+        async function loadLessonFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const lessonId = params.get("lesson");
+            if (!lessonId) return;
+
+            const container = document.getElementById("playlistContainer");
+            container.innerHTML = "<h3 style='grid-column: 1 / -1; text-align:center; font-size:24px; margin-top:50px;'>جاري تحميل الدرس... ⏳</h3>";
+
+            try {
+                const lessonDoc = await getDoc(doc(db, "playlists", lessonId));
+                container.innerHTML = "";
+                if (lessonDoc.exists()) {
+                    await openLesson(lessonDoc.id, lessonDoc.data());
+                } else {
+                    container.innerHTML = "<h3 style='grid-column: 1 / -1; text-align:center; color:#e74c3c; font-size:22px; margin-top:50px;'>⚠️ هذا الدرس غير موجود أو تم حذفه.</h3>";
+                }
+            } catch (err) {
+                console.error("خطأ في تحميل الدرس من الرابط:", err);
+                container.innerHTML = "<h3 style='grid-column: 1 / -1; text-align:center; color:#e74c3c; font-size:22px; margin-top:50px;'>⚠️ حدث خطأ أثناء تحميل الدرس.</h3>";
+            }
+        }
+        loadLessonFromUrl();
     </script>
 </body>
 </html>
