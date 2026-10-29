@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المنصة التعليمية - Madame Aya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .header-controls {
+            text-align: center;
+            padding: 36px 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #f4f7f6 100%);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            border-bottom: 4px solid var(--aya-accent);
+        }
+        .header-controls h1 {
+            color: var(--aya-primary);
+            font-size: 30px;
+            margin-bottom: 8px;
+            font-weight: 900;
+        }
+        .header-controls .subtitle {
+            color: var(--aya-text-muted);
+            font-size: 16px;
+            margin-bottom: 22px;
+        }
+        .header-controls select {
+            padding: 14px 18px;
+            font-size: 17px;
+            border-radius: 10px;
+            border: 2px solid var(--aya-border);
+            outline: none;
+            width: 360px;
+            max-width: 90%;
+            font-weight: bold;
+            background: white;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            transition: 0.2s;
+        }
+        .header-controls select:focus { border-color: var(--aya-blue); }
+        .header-controls button {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, var(--aya-blue), #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 17px;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: 0.25s;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.35);
+            font-family: 'Cairo', sans-serif;
+        }
+        .header-controls button:hover {
+            background: linear-gradient(135deg, #2980b9, #1f6391);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.5);
+        }
+
+        .container { max-width: 1200px; margin: auto; padding: 0 20px; }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 26px;
+        }
+        .video-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            border: 1px solid #eee;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .video-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
+            border-color: var(--aya-blue);
+        }
+        .video-card .thumb-wrap {
+            position: relative;
+            overflow: hidden;
+        }
+        .thumbnail {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            transition: 0.4s;
+        }
+        .video-card:hover .thumbnail { transform: scale(1.05); }
+        .video-card .play-badge {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(231, 76, 60, 0.92);
+            color: white;
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            opacity: 0;
+            transition: 0.3s;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+        }
+        .video-card:hover .play-badge { opacity: 1; }
+        .video-info { padding: 18px 20px; }
+        .video-info h3 {
+            color: var(--aya-primary);
+            font-size: 18px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .video-stats-small {
+            font-size: 13px;
+            color: var(--aya-text-muted);
+            font-weight: bold;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .lesson-link-btn {
+            display: block;
+            margin-top: 12px;
+            color: var(--aya-blue);
+            font-size: 13px;
+            font-weight: bold;
+            text-decoration: none;
+            opacity: 0;
+            transition: 0.3s;
+        }
+        .video-card:hover .lesson-link-btn { opacity: 1; }
+
+        /* المودال القديم أبقينا عليه فقط لاستقبال تسجيل دخول الإدارة */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 3000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .login-modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+        .login-close {
+            position: absolute;
+            top: 15px; left: 22px;
+            font-size: 35px;
+            cursor: pointer;
+            color: #a0aec0;
+            line-height: 1;
+        }
+        .login-close:hover { color: var(--aya-accent); }
+        .login-modal-content input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid var(--aya-border);
+            border-radius: 10px;
+            outline: none;
+            font-size: 16px;
+            font-family: 'Cairo', sans-serif;
+        }
+        .login-modal-content input:focus { border-color: var(--aya-blue); }
+        .login-modal-content button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            margin-top: 12px;
+            background: var(--aya-primary);
+            font-family: 'Cairo', sans-serif;
+            transition: 0.25s;
+        }
+        .login-modal-content button:hover { background: #1a252f; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--aya-text-muted);
+        }
+        .empty-state .icon { font-size: 60px; margin-bottom: 14px; opacity: 0.5; }
+
+        .ad-row {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 20px;
+        }
+        .ad-row .ad-label { display: block; }
+    </style>
+</head>
+<body>
+
+    <nav class="aya-nav">
+        <a href="index.html" class="aya-logo">🇫🇷 Madame Aya</a>
+        <ul class="aya-nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+            <li><a href="courses.html" class="active">المنصة التعليمية</a></li>
+            <li><button class="aya-admin-login-btn" id="openAdminLogin">🔒 دخول الإدارة</button></li>
+            <li>
+                <select class="aya-lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- بانر علوي 728x90 -->
+    <div class="ad-banner-container">
+        <div data-ad="responsive-top"></div>
+    </div>
+
+    <div class="header-controls">
+        <h1>📚 المنصة التعليمية</h1>
+        <div class="subtitle">اختر صفك الدراسي وابدأ رحلتك في تعلم اللغة الفرنسية</div>
+        <select id="gradeSelect">
+            <option value="">-- اختر المرحلة الدراسية --</option>
+            <option value="4_primary">الصف الرابع الابتدائي</option>
+            <option value="5_primary">الصف الخامس الابتدائي</option>
+            <option value="6_primary">الصف السادس الابتدائي</option>
+            <option value="1_prep">الصف الأول الإعدادي</option>
+            <option value="2_prep">الصف الثاني الإعدادي</option>
+            <option value="3_prep">الصف الثالث الإعدادي</option>
+            <option value="1_sec">الصف الأول الثانوي</option>
+            <option value="2_sec">الصف الثاني الثانوي</option>
+            <option value="3_sec">الصف الثالث الثانوي</option>
+        </select>
+        <button id="fetchVideosBtn">🔍 عرض الدروس</button>
+    </div>
+
+    <!-- صف بانر 468x60 تحت أدوات التحكم -->
+    <div class="ad-row">
+        <span class="ad-label">إعلان</span>
+        <div data-ad="468x60"></div>
+    </div>
+
+    <div class="container">
+        <div id="playlistContainer" class="video-grid">
+            <div class="empty-state" style="grid-column:1 / -1;">
+                <div class="icon">📖</div>
+                <h3 style="font-size:22px;color:var(--aya-primary);margin-bottom:8px;">منصة Madame Aya بانتظارك!</h3>
+                <p>اختر المرحلة الدراسية من القائمة أعلاه ثم اضغط على «عرض الدروس» لرؤية كل دروسك.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- بانر Native أسفل الشبكة -->
+    <div class="ad-row">
+        <span class="ad-label">إعلان ممول</span>
+        <div data-ad="native"></div>
+    </div>
+
+    <!-- بانر 300x250 + 728x90 في صف -->
+    <div class="ad-row" style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">
+        <div data-ad="300x250"></div>
+    </div>
+
+    <div id="adminLoginModal" class="modal">
+        <div class="login-modal-content">
+            <span class="login-close" id="closeAdminLogin">&times;</span>
+            <h2 style="margin-bottom: 20px; color: #2d3748;">تسجيل دخول الإدارة</h2>
+            <input type="email" id="adminEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="adminPassword" placeholder="كلمة المرور">
+            <button id="adminLoginBtn">دخول الآن</button>
+        </div>
+    </div>
+
+    <div class="keo-footer">
+        <div class="footer-links">
+            <a href="index.html">الرئيسية</a>
+            <a href="about.html">من نحن</a>
+            <a href="contact.html">تواصل معنا</a>
+            <a href="courses.html">المنصة التعليمية</a>
+        </div>
+        Powered by <span class="brand-keo">keo</span><span class="brand-ai">ai</span>
+    </div>
+
+    <!-- إعلانات شاملة: Popunder + Social Bar -->
+    <script src="js/ads.js"></script>
+
+    <script type="module">
+        import { auth, db, collection, getDocs, query, where, signInWithEmailAndPassword } from './firebase-config.js';
+
+        var adminLoginModal = document.getElementById("adminLoginModal");
+        document.getElementById("openAdminLogin").addEventListener("click", function () {
+            if (auth.currentUser && auth.currentUser.email === "yonisaya123@gmail.com") {
+                window.location.href = "admin.html";
+            } else {
+                adminLoginModal.style.display = "flex";
+            }
+        });
+        document.getElementById("closeAdminLogin").addEventListener("click", function () {
+            adminLoginModal.style.display = "none";
+        });
+        adminLoginModal.addEventListener("click", function (e) {
+            if (e.target === adminLoginModal) adminLoginModal.style.display = "none";
+        });
+
+        document.getElementById("adminLoginBtn").addEventListener("click", function () {
+            signInWithEmailAndPassword(auth, document.getElementById("adminEmail").value, document.getElementById("adminPassword").value)
+                .then(function (cred) {
+                    if (cred.user.email === "yonisaya123@gmail.com") window.location.href = "admin.html";
+                    else alert("ليس لديك صلاحيات الإدارة!");
+                }).catch(function () { alert("بيانات الدخول خاطئة!"); });
+        });
+
+        function getYouTubeId(url) {
+            if (!url) return "";
+            var vId = "";
+            if (url.indexOf("v=") !== -1) vId = url.split("v=")[1].substring(0, 11);
+            else if (url.indexOf("youtu.be/") !== -1) vId = url.split("youtu.be/")[1].substring(0, 11);
+            return vId;
+        }
+
+        function escHtml(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function currentGradeParam() {
+            var m = new RegExp('[?&]grade=([^&#]*)').exec(window.location.href);
+            return m ? decodeURIComponent(m[1]) : '';
+        }
+
+        // ملء القائمة المنسدلة تلقائياً لو فيه grade في الرابط
+        (function () {
+            var g = currentGradeParam();
+            if (g) {
+                document.getElementById("gradeSelect").value = g;
+                setTimeout(function () {
+                    document.getElementById("fetchVideosBtn").click();
+                }, 200);
+            }
+        })();
+
+        document.getElementById("fetchVideosBtn").addEventListener("click", async function () {
+            var selectedGrade = document.getElementById("gradeSelect").value;
+            var container = document.getElementById("playlistContainer");
+            if (!selectedGrade) { alert("الرجاء اختيار المرحلة أولاً!"); return; }
+
+            container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;"><div class="icon" style="animation:spin 1.2s linear infinite;">⏳</div><h3>جاري تحميل الدروس...</h3></div>';
+
+            try {
+                var q = query(collection(db, "playlists"), where("grade", "==", selectedGrade));
+                var querySnapshot = await getDocs(q);
+                container.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;"><div class="icon">📭</div><h3>لا توجد دروس حالياً في هذه المرحلة.</h3><p>تابعنا قريباً لإضافة دروس جديدة.</p></div>';
+                    AdsBoot.inject(container);
+                    return;
+                }
+
+                // بانر 300x250 داخل الشبكة بعد أول 4 دروس
+                var injectedMidAd = false;
+
+                querySnapshot.forEach(function (documentSnapshot, idx) {
+                    var data = documentSnapshot.data();
+                    var docId = documentSnapshot.id;
+                    var videoId = getYouTubeId(data.url);
+                    var thumbnailUrl = videoId
+                        ? "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg"
+                        : "https://via.placeholder.com/300x180";
+
+                    var card = document.createElement("a");
+                    card.className = "video-card";
+                    card.href = "lesson.html?id=" + encodeURIComponent(docId) + "&grade=" + encodeURIComponent(selectedGrade);
+                    card.innerHTML = ''
+                        + '<div class="thumb-wrap">'
+                        + '  <img src="' + thumbnailUrl + '" class="thumbnail" onerror="this.src=\'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg\'">'
+                        + '  <div class="play-badge">▶</div>'
+                        + '</div>'
+                        + '<div class="video-info">'
+                        + '  <h3>' + escHtml(data.title) + '</h3>'
+                        + '  <div class="video-stats-small">'
+                        + '    <span>👁️ ' + (data.views || 0) + ' مشاهدة</span>'
+                        + '    <span>👍 ' + (data.likes || 0) + ' إعجاب</span>'
+                        + '  </div>'
+                        + '  <span class="lesson-link-btn">افتح صفحة الدرس ←</span>'
+                        + '</div>';
+                    container.appendChild(card);
+
+                    // حقن بانر 300x250 بعد الدرس الثالث كInterstitial
+                    if (!injectedMidAd && idx === 3) {
+                        injectedMidAd = true;
+                        var adSlot = document.createElement("div");
+                        adSlot.style.cssText = "display:flex;justify-content:center;align-items:center;border-radius:16px;background:white;box-shadow:0 6px 22px rgba(0,0,0,0.08);padding:10px;min-height:260px;";
+                        adSlot.innerHTML = '<div data-ad="300x250"></div>';
+                        container.appendChild(adSlot);
+                        AdsBoot.inject(adSlot);
+                    }
+                });
+
+                // حقن أي إعلانات ظهرت حديثاً
+                AdsBoot.inject(container);
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = '<div class="empty-state" style="grid-column:1 / -1;"><div class="icon">⚠️</div><h3>حدث خطأ أثناء تحميل الدروس.</h3></div>';
+            }
+        });
+
+        // تشغيل الإعلانات الشاملة
+        AdsBoot.init();
+    </script>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'ar', includedLanguages: 'ar,en,fr', autoDisplay: false }, 'google_translate_element');
+        }
+        function changeLanguage(lang) {
+            var selectField = document.querySelector(".goog-te-combo");
+            if (selectField) { selectField.value = lang; selectField.dispatchEvent(new Event('change')); }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>

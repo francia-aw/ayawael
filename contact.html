@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا - Le Français avec Madame Aya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .contact-hero {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .contact-hero h1 {
+            font-size: 38px;
+            margin-bottom: 12px;
+            font-weight: 900;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+        }
+        .contact-hero p {
+            font-size: 18px;
+            opacity: 0.96;
+        }
+
+        .contact-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        @media (max-width: 768px) {
+            .contact-container { grid-template-columns: 1fr; }
+        }
+        .contact-info, .contact-form {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: var(--aya-shadow-md);
+            border-top: 5px solid var(--aya-blue);
+        }
+        .contact-info { border-top-color: var(--aya-accent); }
+        h1 { color: var(--aya-primary); margin-bottom: 14px; font-size: 26px; font-weight: 900; }
+        h1 + p { font-size: 15px; color: #64748b; margin-bottom: 22px; line-height: 1.7; }
+
+        .social-links {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            font-size: 17px;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            text-align: right;
+            transition: 0.25s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .social-btn:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 8px 18px rgba(0,0,0,0.15); }
+        .social-btn .ico { font-size: 24px; }
+        .btn-fb { background: linear-gradient(135deg, #1877F2, #0d5fc0); }
+        .btn-yt { background: linear-gradient(135deg, #FF0000, #cc0000); }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-bottom: 1px dashed var(--aya-border);
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .ico {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--aya-blue), #2980b9);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .info-row .lbl {
+            display: block;
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: bold;
+        }
+        .info-row .val {
+            font-size: 16px;
+            color: var(--aya-primary);
+            font-weight: bold;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 13px 16px;
+            margin-bottom: 14px;
+            border: 2px solid var(--aya-border);
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            font-family: 'Cairo', sans-serif;
+            transition: 0.2s;
+        }
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: var(--aya-accent);
+        }
+        .contact-form textarea {
+            height: 130px;
+            resize: vertical;
+        }
+        .contact-form button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--aya-accent), #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: 'Cairo', sans-serif;
+            box-shadow: 0 4px 12px rgba(231,76,60,0.35);
+        }
+        .contact-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231,76,60,0.5);
+        }
+        #successMessage {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            border: 1px solid #c3e6cb;
+            margin-bottom: 14px;
+        }
+
+        .ad-row { max-width: 1000px; margin: 30px auto; padding: 0 20px; text-align: center; }
+        .ad-row .ad-label { display: block; }
+    </style>
+</head>
+<body>
+
+    <nav class="aya-nav">
+        <a href="index.html" class="aya-logo">🇫🇷 Madame Aya</a>
+        <ul class="aya-nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="contact.html" class="active">تواصل معنا</a></li>
+            <li><a href="courses.html">المنصة التعليمية</a></li>
+            <li>
+                <select class="aya-lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- بانر علوي -->
+    <div class="ad-banner-container">
+        <div data-ad="responsive-top"></div>
+    </div>
+
+    <div class="contact-hero">
+        <h1>تواصل معنا ✉️</h1>
+        <p>يسعدنا تواصلك معنا في أي وقت للأسئلة أو الاستفسارات</p>
+    </div>
+
+    <!-- بانر 468x60 -->
+    <div class="ad-row">
+        <span class="ad-label">إعلان</span>
+        <div data-ad="468x60"></div>
+    </div>
+
+    <div class="contact-container">
+        <div class="contact-form">
+            <h1>إرسال رسالة 📨</h1>
+            <p>أرسل استفسارك وسنقوم بالرد عليك في أقرب وقت ممكن.</p>
+            <div id="successMessage">✅ تم إرسال رسالتك بنجاح! شكراً لتواصلك معنا.</div>
+            <form id="ajaxContactForm">
+                <input type="text" name="name" id="userName" placeholder="اسمك الكريم" required>
+                <input type="email" name="email" id="userEmail" placeholder="بريدك الإلكتروني" required>
+                <textarea name="message" id="userMessage" placeholder="اكتب رسالتك أو استفسارك هنا..." required></textarea>
+                <button type="submit" id="submitBtn">إرسال الرسالة 📤</button>
+            </form>
+        </div>
+
+        <div class="contact-info">
+            <h1>حساباتنا الرسمية 📱</h1>
+            <p>يمكنك أيضاً التواصل معنا ومتابعة أحدث الفيديوهات عبر المنصات التالية:</p>
+
+            <div class="info-row">
+                <div class="ico">📧</div>
+                <div>
+                    <span class="lbl">البريد الإلكتروني</span>
+                    <span class="val">yonisaya123@gmail.com</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 22px;">
+                <div class="social-links">
+                    <a href="#" target="_blank" class="social-btn btn-fb">
+                        <span class="ico">📘</span>
+                        <span>صفحتنا على Facebook</span>
+                    </a>
+                    <a href="#" target="_blank" class="social-btn btn-yt">
+                        <span class="ico">▶️</span>
+                        <span>قناتنا على YouTube</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- بانر 300x250 داخل عمود التواصل -->
+            <div style="margin-top: 22px; display:flex; justify-content:center;">
+                <div data-ad="300x250"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بانر Native -->
+    <div class="ad-row">
+        <span class="ad-label">إعلان ممول</span>
+        <div data-ad="native"></div>
+    </div>
+
+    <div class="keo-footer">
+        <div class="footer-links">
+            <a href="index.html">الرئيسية</a>
+            <a href="about.html">من نحن</a>
+            <a href="contact.html">تواصل معنا</a>
+            <a href="courses.html">المنصة التعليمية</a>
+        </div>
+        Powered by <span class="brand-keo">keo</span><span class="brand-ai">ai</span>
+    </div>
+
+    <script src="js/ads.js"></script>
+    <script>
+        AdsBoot.init();
+
+        document.getElementById('ajaxContactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var btn = document.getElementById('submitBtn');
+            btn.innerText = "جاري الإرسال... ⏳";
+            btn.disabled = true;
+
+            var formData = new FormData();
+            formData.append('name', document.getElementById('userName').value);
+            formData.append('email', document.getElementById('userEmail').value);
+            formData.append('message', document.getElementById('userMessage').value);
+            formData.append('_subject', 'رسالة جديدة من منصة Madame Aya');
+
+            fetch("https://formsubmit.co/ajax/yonisaya123@gmail.com", {
+                method: "POST", body: formData
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                document.getElementById('ajaxContactForm').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+            })
+            .catch(function(error) {
+                alert("حدث خطأ أثناء الإرسال، حاول مرة أخرى.");
+                btn.innerText = "إرسال الرسالة 📤";
+                btn.disabled = false;
+            });
+        });
+
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'ar', includedLanguages: 'ar,en,fr', autoDisplay: false }, 'google_translate_element');
+        }
+        function changeLanguage(lang) {
+            var selectField = document.querySelector(".goog-te-combo");
+            if (selectField) { selectField.value = lang; selectField.dispatchEvent(new Event('change')); }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
