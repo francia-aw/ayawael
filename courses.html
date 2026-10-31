@@ -451,8 +451,23 @@
                     return;
                 }
 
+                // ===== تجميع الدروس في array وفرزها حسب حقل order (تصاعدياً) =====
+                // الدروس اللي مالهاش order بتأخد 0 (تظهر فوق كأقدم دروس).
+                // fallback للترتيب الأبجدي لو درسين عندهم نفس الـ order.
+                // الترتيب ده هو نفسه اللي الأدمن بيضبطه من admin.html — فأي تعديل
+                // في ترتيب الدروس هيظهر تلقائياً هنا.
+                const lessonsArr = [];
                 querySnapshot.forEach((documentSnapshot) => {
-                    const data = documentSnapshot.data();
+                    lessonsArr.push({ doc: documentSnapshot, data: documentSnapshot.data() });
+                });
+                lessonsArr.sort((a, b) => {
+                    const aOrder = (typeof a.data.order === "number") ? a.data.order : 0;
+                    const bOrder = (typeof b.data.order === "number") ? b.data.order : 0;
+                    if (aOrder !== bOrder) return aOrder - bOrder;
+                    return (a.data.title || "").localeCompare(b.data.title || "");
+                });
+
+                lessonsArr.forEach(({ doc: documentSnapshot, data }) => {
                     const docId = documentSnapshot.id;
                     const videoId = getYouTubeId(data.url);
                     const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : 'https://via.placeholder.com/300x180';
