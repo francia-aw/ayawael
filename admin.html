@@ -25,9 +25,31 @@
         .question-block { background: #f7fafc; border: 1px dashed #a0aec0; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
         .remove-q-btn { position: absolute; top: 5px; left: 5px; background: #e53e3e; width: auto; padding: 5px 10px; font-size: 12px; }
         .add-q-btn { background-color: #48bb78; margin-bottom: 20px; }
-        .lesson-item { background: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s; }
-        .lesson-item .lesson-content { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-        .lesson-item h4 { margin: 0; word-wrap: break-word; overflow-wrap: anywhere; }
+        .lesson-item {
+            background: #f7fafc; border: 1px solid #e2e8f0; padding: 12px 14px;
+            border-radius: 10px; margin-bottom: 10px; transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s;
+            border-right: 4px solid #3182ce;
+        }
+        .lesson-item .lesson-top {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+        }
+        .lesson-item .lesson-order {
+            background: #3182ce; color: white; min-width: 28px; height: 28px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: bold; flex-shrink: 0;
+        }
+        .lesson-item h4 {
+            margin: 0; flex: 1; min-width: 0; font-size: 15px; color: #2d3748;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .lesson-item .lesson-bottom {
+            display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+            padding-right: 38px; /* محاذاة مع بداية العنوان بعد رقم الترتيب */
+        }
+        .lesson-item .grade-tag {
+            background: #ebf8ff; color: #2b6cb0; font-size: 11px; font-weight: bold;
+            padding: 3px 10px; border-radius: 12px; margin-left: auto;
+        }
 
         .actions-div { display: flex; gap: 5px; }
         .delete-btn { background-color: #e53e3e; width: auto; padding: 8px 15px; margin: 0; }
@@ -35,20 +57,20 @@
         .edit-btn:hover { background-color: #d69e2e; }
 
         /* ===== أزرار الترتيب للأعلى/الأسفل ===== */
-        .reorder-div { display: flex; gap: 4px; }
+        .reorder-div { display: flex; gap: 4px; margin-right: auto; }
         .reorder-btn {
-            background-color: #4299e1; color: white; width: auto; padding: 8px 10px;
-            margin: 0; font-size: 14px; line-height: 1; min-width: 36px; border-radius: 6px;
+            background-color: #4299e1; color: white; width: auto; padding: 7px 11px;
+            margin: 0; font-size: 13px; line-height: 1; min-width: 34px; border-radius: 6px;
         }
-        .reorder-btn:hover { background-color: #2b6cb0; }
-        .reorder-btn:disabled { background-color: #a0aec0; opacity: 0.5; cursor: not-allowed; }
+        .reorder-btn:hover:not(:disabled) { background-color: #2b6cb0; }
+        .reorder-btn:disabled { background-color: #cbd5e0; opacity: 0.5; cursor: not-allowed; }
 
         /* ===== مقبض السحب (drag handle) ===== */
         .drag-handle {
-            cursor: grab; user-select: none; padding: 4px 10px;
+            cursor: grab; user-select: none; padding: 6px 12px;
             background: #e2e8f0; color: #4a5568; border-radius: 6px;
-            font-size: 18px; line-height: 1; flex-shrink: 0;
-            touch-action: none;
+            font-size: 16px; line-height: 1; flex-shrink: 0;
+            touch-action: none; border: 1px solid #cbd5e0;
         }
         .drag-handle:hover { background: #cbd5e0; color: #2d3748; }
         .drag-handle:active { cursor: grabbing; }
@@ -643,7 +665,7 @@ a) va   b) vais   c) vas   صح: a"></textarea>
             }
         }
 
-        // تحديث حالة أزرار التحريك (تعطيل أول/أختر زر للأعلى/الأسفل)
+        // تحديث حالة أزرار التحريك (تعطيل أول/أختر زر للأعلى/الأسفل) وإعادة ترقيم الدروس
         function updateReorderButtonsState() {
             const items = document.querySelectorAll('#allLessonsContainer .lesson-item');
             items.forEach((item, idx) => {
@@ -651,22 +673,44 @@ a) va   b) vais   c) vas   صح: a"></textarea>
                 const downBtn = item.querySelector('.reorder-down');
                 if (upBtn) upBtn.disabled = (idx === 0);
                 if (downBtn) downBtn.disabled = (idx === items.length - 1);
+                // إعادة ترقيم رقم الترتيب
+                const orderSpan = item.querySelector('.lesson-order');
+                if (orderSpan) {
+                    orderSpan.textContent = (idx + 1);
+                    orderSpan.dataset.orderNum = (idx + 1);
+                }
             });
         }
+
+        // خريطة مراحل الصفوف الدراسية لعرضها كـ tag
+        const GRADE_LABELS = {
+            "4_primary": "٤ ابتدائي",
+            "5_primary": "٥ ابتدائي",
+            "6_primary": "٦ ابتدائي",
+            "1_prep": "١ إعدادي",
+            "2_prep": "٢ إعدادي",
+            "3_prep": "٣ إعدادي",
+            "1_sec": "١ ثانوي",
+            "2_sec": "٢ ثانوي",
+            "3_sec": "٣ ثانوي"
+        };
 
         // بناء عنصر درس واحد في الـ DOM
         function buildLessonElement(docSnap, data, index) {
             const safeTitle = (data.title || '').replace(/'/g, "\\'");
+            const gradeLabel = GRADE_LABELS[data.grade] || "";
             const div = document.createElement("div");
             div.className = "lesson-item";
             div.dataset.id = docSnap.id;
             div.draggable = false; // السحب يتفعل من الـ handle فقط
             div.innerHTML = `
-                <div class="lesson-content">
-                    <span class="drag-handle" title="اسحب لإعادة الترتيب" draggable="true">⠿</span>
-                    <h4 id="title-${docSnap.id}">${data.title}</h4>
+                <div class="lesson-top">
+                    <span class="lesson-order" data-order-num="${index + 1}">${index + 1}</span>
+                    <h4 id="title-${docSnap.id}" title="${data.title}">${data.title}</h4>
+                    ${gradeLabel ? `<span class="grade-tag">${gradeLabel}</span>` : ''}
                 </div>
-                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: nowrap;">
+                <div class="lesson-bottom">
+                    <span class="drag-handle" title="اسحب لإعادة الترتيب" draggable="true">⠿ اسحب</span>
                     <div class="reorder-div">
                         <button class="reorder-btn reorder-up" title="تحريك للأعلى">▲</button>
                         <button class="reorder-btn reorder-down" title="تحريك للأسفل">▼</button>
