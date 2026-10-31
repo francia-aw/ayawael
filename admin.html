@@ -96,6 +96,36 @@
         }
         .lessons-hint b { color: #2b6cb0; }
 
+        /* ===== تبويبات المراحل الدراسية ===== */
+        .grade-tabs {
+            display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 15px;
+            padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;
+        }
+        .grade-tab {
+            background: #edf2f7; color: #4a5568; border: 1px solid #cbd5e0;
+            padding: 7px 14px; border-radius: 20px; cursor: pointer;
+            font-size: 13px; font-weight: bold; font-family: 'Cairo', sans-serif;
+            transition: 0.2s; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .grade-tab:hover { background: #e2e8f0; color: #2d3748; }
+        .grade-tab.active {
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: white; border-color: #2b6cb0;
+            box-shadow: 0 4px 10px rgba(49, 130, 203, 0.3);
+        }
+        .grade-tab .tab-count {
+            background: rgba(255,255,255,0.25); padding: 1px 7px;
+            border-radius: 10px; font-size: 11px; font-weight: bold;
+        }
+        .grade-tab.active .tab-count { background: rgba(255,255,255,0.3); }
+        .grade-tab.empty-stage { color: #a0aec0; }
+        .grade-tab.empty-stage:hover { color: #718096; }
+        .empty-stage-label {
+            text-align: center; padding: 30px 15px; color: #a0aec0;
+            font-size: 14px; background: #f7fafc; border-radius: 8px;
+            border: 1px dashed #cbd5e0;
+        }
+
         .delete-result-btn { background-color: #e53e3e; padding: 5px 10px; font-size: 12px; border-radius: 5px; width: auto; margin: 0; }
         .logout-btn { background-color: #718096; width: auto; position: absolute; top: 20px; left: 20px; }
 
@@ -346,8 +376,10 @@ a) va   b) vais   c) vas   صح: a"></textarea>
             <div class="card">
                 <h2>📂 إدارة الدروس</h2>
                 <div class="lessons-hint">
-                    🔁 تقدر ترتب الدروس بـ <b>السحب والإفلات</b> عبر مقبض ⠿ جنب كل درس، أو استخدم زراري <b>▲ ▼</b> للتحريك للأعلى/الأسفل. الترتيب بيتحفظ تلقائياً في قاعدة البيانات.
+                    🔁 اختار المرحلة من التبويبات بالأسفل، وبعدين تقدر ترتب دروسها بـ <b>السحب والإفلات</b> عبر مقبض ⠿ جنب كل درس، أو استخدم زراري <b>▲ ▼</b> للتحريك. الترتيب بيتحفظ تلقائياً في قاعدة البيانات.
                 </div>
+                <!-- تبويبات المراحل الدراسية -->
+                <div id="gradeTabs" class="grade-tabs"></div>
                 <div id="allLessonsContainer" style="max-height: 500px; overflow-y: auto;">جاري التحميل...</div>
                 <div id="reorderStatus" class="reorder-status"></div>
             </div>
@@ -649,6 +681,15 @@ a) va   b) vais   c) vas   صح: a"></textarea>
         let lessonsCache = [];
         let dragSrcEl = null;
         let isReordering = false;
+        // المرحلة النشطة حالياً في التبويبات
+        let activeGrade = null;
+
+        // ترتيب عرض المراحل في التبويبات
+        const GRADE_ORDER = [
+            "4_primary", "5_primary", "6_primary",
+            "1_prep", "2_prep", "3_prep",
+            "1_sec", "2_sec", "3_sec"
+        ];
 
         // عرض حالة حفظ الترتيب
         function setReorderStatus(message, type = "") {
@@ -795,7 +836,7 @@ a) va   b) vais   c) vas   صح: a"></textarea>
             saveLessonOrder();
         }
 
-        // حفظ الترتيب الحالي في Firestore (batch update على حقل order)
+        // حفظ الترتيب الحالي في Firestore (batch update على حقل order) — فقط للدروس الظاهرة في المرحلة النشطة
         async function saveLessonOrder() {
             if (isReordering) return;
             const container = document.getElementById("allLessonsContainer");
@@ -815,8 +856,20 @@ a) va   b) vais   c) vas   صح: a"></textarea>
                 });
                 await Promise.all(updates);
 
+                // تحديث الـ cache محلياً بنفس الترتيب الجديد (علشان ما نضطرش نعمل reload)
+                const currentGrade = activeGrade;
+                lessonsCache = lessonsCache.filter(entry => entry.data.grade !== currentGrade);
+                items.forEach((item, index) => {
+                    const entry = lessonsCache.find(e => e.id === item.dataset.id);
+                    if (entry) {
+                        entry.data.order = Date.now() + index;
+                        lessonsCache.push(entry);
+                    }
+                });
+
                 setReorderStatus("✅ تم حفظ الترتيب بنجاح!", "saved");
                 updateReorderButtonsState();
+                updateGradeTabsCounts();
             } catch (err) {
                 console.error("خطأ في حفظ الترتيب:", err);
                 setReorderStatus("❌ فشل حفظ الترتيب: " + (err.message || "خطأ غير معروف"), "error");
@@ -825,37 +878,109 @@ a) va   b) vais   c) vas   صح: a"></textarea>
             }
         }
 
+        // ===== بناء تبويبات المراحل الدراسية =====
+        function renderGradeTabs() {
+            const tabsContainer = document.getElementById("gradeTabs");
+            tabsContainer.innerHTML = "";
+
+            // عدّ عدد الدروس في كل مرحلة
+            const gradeCounts = {};
+            GRADE_ORDER.forEach(g => gradeCounts[g] = 0);
+            lessonsCache.forEach(entry => {
+                const g = entry.data.grade;
+                if (gradeCounts[g] !== undefined) gradeCounts[g]++;
+            });
+
+            GRADE_ORDER.forEach((gradeKey) => {
+                const tab = document.createElement("button");
+                tab.className = "grade-tab";
+                tab.dataset.grade = gradeKey;
+                if (gradeCounts[gradeKey] === 0) tab.classList.add("empty-stage");
+                if (gradeKey === activeGrade) tab.classList.add("active");
+                tab.innerHTML = `${GRADE_LABELS[gradeKey]} <span class="tab-count">${gradeCounts[gradeKey]}</span>`;
+                tab.addEventListener("click", () => {
+                    activeGrade = gradeKey;
+                    renderGradeTabs(); // لإعادة التمييز
+                    renderGradeLessons();
+                });
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // ===== تحديث عدّاد الدروس في كل تبويب (بعد حذف/إضافة) =====
+        function updateGradeTabsCounts() {
+            const gradeCounts = {};
+            GRADE_ORDER.forEach(g => gradeCounts[g] = 0);
+            lessonsCache.forEach(entry => {
+                const g = entry.data.grade;
+                if (gradeCounts[g] !== undefined) gradeCounts[g]++;
+            });
+            document.querySelectorAll("#gradeTabs .grade-tab").forEach(tab => {
+                const g = tab.dataset.grade;
+                const count = gradeCounts[g] || 0;
+                const countSpan = tab.querySelector(".tab-count");
+                if (countSpan) countSpan.textContent = count;
+                if (count === 0) tab.classList.add("empty-stage");
+                else tab.classList.remove("empty-stage");
+            });
+        }
+
+        // ===== عرض دروس المرحلة النشطة فقط =====
+        function renderGradeLessons() {
+            const container = document.getElementById("allLessonsContainer");
+            container.innerHTML = "";
+
+            if (!activeGrade) {
+                container.innerHTML = "<div class='empty-stage-label'>اختار مرحلة من التبويبات بالأعلى</div>";
+                return;
+            }
+
+            // فلترة الدروس حسب المرحلة النشطة، وترتيبها حسب order
+            const gradeLessons = lessonsCache
+                .filter(entry => entry.data.grade === activeGrade)
+                .sort((a, b) => {
+                    const aOrder = (typeof a.data.order === "number") ? a.data.order : 0;
+                    const bOrder = (typeof b.data.order === "number") ? b.data.order : 0;
+                    if (aOrder !== bOrder) return aOrder - bOrder;
+                    return (a.data.title || "").localeCompare(b.data.title || "");
+                });
+
+            if (gradeLessons.length === 0) {
+                container.innerHTML = "<div class='empty-stage-label'>📭 مفيش دروس مرفوعة في المرحلة دي بعد.<br>أضف درس جديد من النموذج على الشمال واختار مرحلته.</div>";
+                return;
+            }
+
+            gradeLessons.forEach((entry, idx) => {
+                container.appendChild(buildLessonElement({ id: entry.id }, entry.data, idx));
+            });
+            updateReorderButtonsState();
+        }
+
         // جلب البيانات للوحة التحكم
         async function loadDashboardData() {
             // جلب الدروس
-            const container = document.getElementById("allLessonsContainer");
             const querySnapshot = await getDocs(collection(db, "playlists"));
             document.getElementById("totalLessons").innerText = querySnapshot.size;
 
-            // تجميع الدروس وترتيبها حسب حقل order (تصاعدي). الدروس اللي مالهاش order بتاخذ 0 (الأقدم)
+            // تجميع الدروس
             const lessonsArr = [];
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
                 lessonsArr.push({ id: docSnap.id, data });
             });
-            lessonsArr.sort((a, b) => {
-                const aOrder = (typeof a.data.order === "number") ? a.data.order : 0;
-                const bOrder = (typeof b.data.order === "number") ? b.data.order : 0;
-                if (aOrder !== bOrder) return aOrder - bOrder;
-                // fallback للترتيب الأبجدي لو نفس الـ order (نادر)
-                return (a.data.title || "").localeCompare(b.data.title || "");
-            });
-
             lessonsCache = lessonsArr;
-            container.innerHTML = "";
-            if (lessonsArr.length === 0) {
-                container.innerHTML = "<div style='text-align:center;color:#718096;padding:20px;'>لا توجد دروس مرفوعة بعد</div>";
-            } else {
-                lessonsArr.forEach((entry, idx) => {
-                    container.appendChild(buildLessonElement({ id: entry.id }, entry.data, idx));
-                });
-                updateReorderButtonsState();
+
+            // أول مرحلة فيها دروس هي اللي هتكون نشطة افتراضياً
+            if (!activeGrade) {
+                for (const g of GRADE_ORDER) {
+                    if (lessonsArr.some(e => e.data.grade === g)) { activeGrade = g; break; }
+                }
+                // لو مفيش أي دروس، نعين أول تبويب افتراضي
+                if (!activeGrade) activeGrade = GRADE_ORDER[0];
             }
+
+            renderGradeTabs();
+            renderGradeLessons();
 
             // جلب نتائج الطلاب
             const resultsBody = document.getElementById("studentsResultsBody");
