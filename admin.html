@@ -25,12 +25,54 @@
         .question-block { background: #f7fafc; border: 1px dashed #a0aec0; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; }
         .remove-q-btn { position: absolute; top: 5px; left: 5px; background: #e53e3e; width: auto; padding: 5px 10px; font-size: 12px; }
         .add-q-btn { background-color: #48bb78; margin-bottom: 20px; }
-        .lesson-item { background: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .lesson-item { background: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: box-shadow 0.15s, transform 0.15s, opacity 0.15s; }
+        .lesson-item .lesson-content { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+        .lesson-item h4 { margin: 0; word-wrap: break-word; overflow-wrap: anywhere; }
 
         .actions-div { display: flex; gap: 5px; }
         .delete-btn { background-color: #e53e3e; width: auto; padding: 8px 15px; margin: 0; }
         .edit-btn { background-color: #ecc94b; color: #2d3748; width: auto; padding: 8px 15px; margin: 0; }
         .edit-btn:hover { background-color: #d69e2e; }
+
+        /* ===== أزرار الترتيب للأعلى/الأسفل ===== */
+        .reorder-div { display: flex; gap: 4px; }
+        .reorder-btn {
+            background-color: #4299e1; color: white; width: auto; padding: 8px 10px;
+            margin: 0; font-size: 14px; line-height: 1; min-width: 36px; border-radius: 6px;
+        }
+        .reorder-btn:hover { background-color: #2b6cb0; }
+        .reorder-btn:disabled { background-color: #a0aec0; opacity: 0.5; cursor: not-allowed; }
+
+        /* ===== مقبض السحب (drag handle) ===== */
+        .drag-handle {
+            cursor: grab; user-select: none; padding: 4px 10px;
+            background: #e2e8f0; color: #4a5568; border-radius: 6px;
+            font-size: 18px; line-height: 1; flex-shrink: 0;
+            touch-action: none;
+        }
+        .drag-handle:hover { background: #cbd5e0; color: #2d3748; }
+        .drag-handle:active { cursor: grabbing; }
+
+        /* ===== حالات السحب ===== */
+        .lesson-item.dragging { opacity: 0.4; transform: scale(0.98); box-shadow: 0 4px 12px rgba(49,130,203,0.3); }
+        .lesson-item.drag-over { border: 2px dashed #3182ce; background: #ebf8ff; padding: 13px; }
+        .lesson-item.placeholder { opacity: 0.5; }
+
+        /* ===== مؤشر حفظ الترتيب ===== */
+        .reorder-status {
+            font-size: 12.5px; color: #4a5568; margin-top: 8px;
+            min-height: 18px; text-align: center; transition: opacity 0.2s;
+        }
+        .reorder-status.saving { color: #3182ce; font-weight: bold; }
+        .reorder-status.saved { color: #38a169; font-weight: bold; }
+        .reorder-status.error { color: #e53e3e; font-weight: bold; }
+
+        .lessons-hint {
+            font-size: 12.5px; color: #718096; margin-bottom: 12px;
+            background: #ebf8ff; border-right: 3px solid #3182ce;
+            padding: 8px 12px; border-radius: 6px; line-height: 1.6;
+        }
+        .lessons-hint b { color: #2b6cb0; }
 
         .delete-result-btn { background-color: #e53e3e; padding: 5px 10px; font-size: 12px; border-radius: 5px; width: auto; margin: 0; }
         .logout-btn { background-color: #718096; width: auto; position: absolute; top: 20px; left: 20px; }
@@ -55,7 +97,7 @@
             position: absolute;
             top: -50%; right: -50%;
             width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, transparent 40%);
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, transparent  40%);
             animation: keoai-pulse 6s ease-in-out infinite;
             pointer-events: none;
         }
@@ -281,7 +323,11 @@ a) va   b) vais   c) vas   صح: a"></textarea>
         <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 300px;">
             <div class="card">
                 <h2>📂 إدارة الدروس</h2>
-                <div id="allLessonsContainer" style="max-height: 400px; overflow-y: auto;">جاري التحميل...</div>
+                <div class="lessons-hint">
+                    🔁 تقدر ترتب الدروس بـ <b>السحب والإفلات</b> عبر مقبض ⠿ جنب كل درس، أو استخدم زراري <b>▲ ▼</b> للتحريك للأعلى/الأسفل. الترتيب بيتحفظ تلقائياً في قاعدة البيانات.
+                </div>
+                <div id="allLessonsContainer" style="max-height: 500px; overflow-y: auto;">جاري التحميل...</div>
+                <div id="reorderStatus" class="reorder-status"></div>
             </div>
         </div>
     </div>
@@ -564,9 +610,176 @@ a) va   b) vais   c) vas   صح: a"></textarea>
                 }
             });
             document.getElementById("addVideoBtn").innerText = "جاري النشر...";
-            await addDoc(collection(db, "playlists"), { grade: level, title: title, url: link, questions: questionsArray, views: 0, likes: 0 });
+            // ✅ إضافة حقل order لترتيب الدروس — الدروس الجديدة بتترتيب آخر واحد (timestamp)
+            await addDoc(collection(db, "playlists"), {
+                grade: level, title: title, url: link, questions: questionsArray,
+                views: 0, likes: 0,
+                order: Date.now()
+            });
             alert("✅ تم نشر الدرس!"); window.location.reload();
         });
+
+        // =====================================================
+        // ======  ترتيب الدروس (Reordering)  ===================
+        // =====================================================
+
+        // مخزن مؤقت لبيانات الدروس بعد الجلب من Firestore
+        let lessonsCache = [];
+        let dragSrcEl = null;
+        let isReordering = false;
+
+        // عرض حالة حفظ الترتيب
+        function setReorderStatus(message, type = "") {
+            const status = document.getElementById("reorderStatus");
+            status.className = "reorder-status " + type;
+            status.innerText = message;
+            if (type === "saved") {
+                setTimeout(() => {
+                    if (status.innerText === message) {
+                        status.className = "reorder-status";
+                        status.innerText = "";
+                    }
+                }, 2500);
+            }
+        }
+
+        // تحديث حالة أزرار التحريك (تعطيل أول/أختر زر للأعلى/الأسفل)
+        function updateReorderButtonsState() {
+            const items = document.querySelectorAll('#allLessonsContainer .lesson-item');
+            items.forEach((item, idx) => {
+                const upBtn = item.querySelector('.reorder-up');
+                const downBtn = item.querySelector('.reorder-down');
+                if (upBtn) upBtn.disabled = (idx === 0);
+                if (downBtn) downBtn.disabled = (idx === items.length - 1);
+            });
+        }
+
+        // بناء عنصر درس واحد في الـ DOM
+        function buildLessonElement(docSnap, data, index) {
+            const safeTitle = (data.title || '').replace(/'/g, "\\'");
+            const div = document.createElement("div");
+            div.className = "lesson-item";
+            div.dataset.id = docSnap.id;
+            div.draggable = false; // السحب يتفعل من الـ handle فقط
+            div.innerHTML = `
+                <div class="lesson-content">
+                    <span class="drag-handle" title="اسحب لإعادة الترتيب" draggable="true">⠿</span>
+                    <h4 id="title-${docSnap.id}">${data.title}</h4>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: nowrap;">
+                    <div class="reorder-div">
+                        <button class="reorder-btn reorder-up" title="تحريك للأعلى">▲</button>
+                        <button class="reorder-btn reorder-down" title="تحريك للأسفل">▼</button>
+                    </div>
+                    <div class="actions-div">
+                        <button class="edit-btn" onclick="editVideoTitle('${docSnap.id}', '${safeTitle}')">تعديل</button>
+                        <button class="delete-btn" onclick="deleteVideo('${docSnap.id}')">حذف</button>
+                    </div>
+                </div>
+            `;
+
+            // ===== ربط أزرار التحريك للأعلى/الأسفل =====
+            div.querySelector('.reorder-up').addEventListener('click', () => moveLesson(div, -1));
+            div.querySelector('.reorder-down').addEventListener('click', () => moveLesson(div, 1));
+
+            // ===== ربط أحداث السحب على الـ handle =====
+            const handle = div.querySelector('.drag-handle');
+
+            handle.addEventListener('dragstart', (e) => {
+                dragSrcEl = div;
+                div.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', div.dataset.id);
+            });
+
+            handle.addEventListener('dragend', () => {
+                div.classList.remove('dragging');
+                document.querySelectorAll('.lesson-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+                dragSrcEl = null;
+                // حفظ الترتيب الجديد بعد انتهاء السحب
+                saveLessonOrder();
+            });
+
+            // السماح بإلقاء العناصر فوق هذا العنصر
+            div.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                if (dragSrcEl && dragSrcEl !== div) {
+                    e.dataTransfer.dropEffect = 'move';
+                    div.classList.add('drag-over');
+                }
+            });
+
+            div.addEventListener('dragleave', () => {
+                div.classList.remove('drag-over');
+            });
+
+            div.addEventListener('drop', (e) => {
+                e.preventDefault();
+                div.classList.remove('drag-over');
+                if (!dragSrcEl || dragSrcEl === div) return;
+
+                const container = div.parentNode;
+                const allItems = Array.from(container.children).filter(el => el.classList && el.classList.contains('lesson-item'));
+
+                if (allItems.indexOf(dragSrcEl) > allItems.indexOf(div)) {
+                    // السحب من الأسفل للأعلى → إدراج قبل الهدف
+                    container.insertBefore(dragSrcEl, div);
+                } else {
+                    // السحب من الأعلى للأسفل → إدراج بعد الهدف
+                    container.insertBefore(dragSrcEl, div.nextSibling);
+                }
+            });
+
+            return div;
+        }
+
+        // تحريك درس درجة واحدة (up = -1, down = +1)
+        function moveLesson(itemEl, direction) {
+            if (isReordering) return;
+            const container = itemEl.parentNode;
+            const items = Array.from(container.children).filter(el => el.classList && el.classList.contains('lesson-item'));
+            const idx = items.indexOf(itemEl);
+            const targetIdx = idx + direction;
+            if (targetIdx < 0 || targetIdx >= items.length) return;
+
+            if (direction === -1) {
+                container.insertBefore(itemEl, items[targetIdx]);
+            } else {
+                container.insertBefore(itemEl, items[targetIdx].nextSibling);
+            }
+            updateReorderButtonsState();
+            saveLessonOrder();
+        }
+
+        // حفظ الترتيب الحالي في Firestore (batch update على حقل order)
+        async function saveLessonOrder() {
+            if (isReordering) return;
+            const container = document.getElementById("allLessonsContainer");
+            const items = Array.from(container.children).filter(el => el.classList && el.classList.contains('lesson-item'));
+            if (items.length === 0) return;
+
+            isReordering = true;
+            setReorderStatus("⏳ جاري حفظ الترتيب الجديد...", "saving");
+
+            try {
+                // نعطي كل عنصر رقم ترتيب تسلسلي (نستخدم timestamp مع offset بسيط عشان نضمن التمييز)
+                const baseTime = Date.now();
+                const updates = items.map((item, index) => {
+                    const id = item.dataset.id;
+                    const newOrder = baseTime + index; // ترتيب تصاعدي حسب موضع العنصر
+                    return updateDoc(doc(db, "playlists", id), { order: newOrder });
+                });
+                await Promise.all(updates);
+
+                setReorderStatus("✅ تم حفظ الترتيب بنجاح!", "saved");
+                updateReorderButtonsState();
+            } catch (err) {
+                console.error("خطأ في حفظ الترتيب:", err);
+                setReorderStatus("❌ فشل حفظ الترتيب: " + (err.message || "خطأ غير معروف"), "error");
+            } finally {
+                isReordering = false;
+            }
+        }
 
         // جلب البيانات للوحة التحكم
         async function loadDashboardData() {
@@ -574,18 +787,31 @@ a) va   b) vais   c) vas   صح: a"></textarea>
             const container = document.getElementById("allLessonsContainer");
             const querySnapshot = await getDocs(collection(db, "playlists"));
             document.getElementById("totalLessons").innerText = querySnapshot.size;
-            container.innerHTML = "";
+
+            // تجميع الدروس وترتيبها حسب حقل order (تصاعدي). الدروس اللي مالهاش order بتاخذ 0 (الأقدم)
+            const lessonsArr = [];
             querySnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                container.innerHTML += `
-                <div class="lesson-item">
-                    <div><h4 id="title-${docSnap.id}">${data.title}</h4></div>
-                    <div class="actions-div">
-                        <button class="edit-btn" onclick="editVideoTitle('${docSnap.id}', '${data.title.replace(/'/g, "\\'")}')">تعديل</button>
-                        <button class="delete-btn" onclick="deleteVideo('${docSnap.id}')">حذف</button>
-                    </div>
-                </div>`;
+                lessonsArr.push({ id: docSnap.id, data });
             });
+            lessonsArr.sort((a, b) => {
+                const aOrder = (typeof a.data.order === "number") ? a.data.order : 0;
+                const bOrder = (typeof b.data.order === "number") ? b.data.order : 0;
+                if (aOrder !== bOrder) return aOrder - bOrder;
+                // fallback للترتيب الأبجدي لو نفس الـ order (نادر)
+                return (a.data.title || "").localeCompare(b.data.title || "");
+            });
+
+            lessonsCache = lessonsArr;
+            container.innerHTML = "";
+            if (lessonsArr.length === 0) {
+                container.innerHTML = "<div style='text-align:center;color:#718096;padding:20px;'>لا توجد دروس مرفوعة بعد</div>";
+            } else {
+                lessonsArr.forEach((entry, idx) => {
+                    container.appendChild(buildLessonElement({ id: entry.id }, entry.data, idx));
+                });
+                updateReorderButtonsState();
+            }
 
             // جلب نتائج الطلاب
             const resultsBody = document.getElementById("studentsResultsBody");
