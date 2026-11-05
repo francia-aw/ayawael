@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2732684160406609"
+     crossorigin="anonymous"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المدونة - Le Français avec Madame Aya</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
+        body { background-color: #f8f9fa; color: #333; line-height: 1.8; top: 0px !important; position: static !important; }
+
+        iframe.goog-te-banner-frame { display: none !important; }
+        #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+        .goog-text-highlight { background: transparent !important; box-shadow: none !important; }
+        #google_translate_element { opacity: 0; position: absolute; z-index: -1; width: 0; height: 0; overflow: hidden; }
+
+        nav { background-color: #2c3e50; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 15px;}
+        .logo { color: white; font-size: 24px; font-weight: 900; }
+        .nav-links { list-style: none; display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .nav-links li a { color: white; text-decoration: none; font-size: 18px; transition: 0.3s; padding: 5px 10px; border-radius: 5px; }
+        .nav-links li a:hover, .active { background-color: #e74c3c; }
+
+        .custom-lang-selector { background-color: #34495e; color: white; border: 1px solid #bdc3c7; padding: 5px 10px; border-radius: 5px; font-size: 16px; cursor: pointer; outline: none; font-weight: bold; }
+        .custom-lang-selector:hover { background-color: #2c3e50; }
+
+        .page-header { background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); color: white; text-align: center; padding: 50px 20px; }
+        .page-header h1 { font-size: 40px; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
+        .page-header p { font-size: 18px; max-width: 700px; margin: 0 auto; }
+
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .blog-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.06); transition: 0.3s; cursor: pointer; border-top: 5px solid #3498db; display: flex; flex-direction: column; }
+        .blog-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.12); }
+        .blog-card-image { width: 100%; height: 180px; background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%); display: flex; align-items: center; justify-content: center; font-size: 60px; }
+        .blog-card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .blog-card-date { font-size: 13px; color: #95a5a6; margin-bottom: 8px; font-weight: bold; }
+        .blog-card h3 { color: #2c3e50; font-size: 20px; margin-bottom: 10px; }
+        .blog-card p { color: #555; font-size: 15px; flex: 1; }
+        .blog-read-more { color: #e74c3c; font-weight: bold; margin-top: 12px; font-size: 15px; }
+
+        /* نافذة المقال */
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); justify-content: center; align-items: flex-start; padding: 30px 15px; overflow-y: auto; }
+        .modal-content { background: white; padding: 40px; border-radius: 15px; width: 100%; max-width: 750px; position: relative; margin: auto; }
+        .modal-close { position: absolute; top: 15px; left: 20px; font-size: 35px; cursor: pointer; color: #a0aec0; transition: 0.3s; }
+        .modal-close:hover { color: #e74c3c; }
+        .modal-date { color: #95a5a6; font-size: 14px; margin-bottom: 8px; font-weight: bold; }
+        .modal-content h2 { color: #2c3e50; font-size: 28px; margin-bottom: 20px; line-height: 1.4; }
+        .modal-content .modal-body { font-size: 17px; color: #444; line-height: 1.9; }
+        .modal-content .modal-body p { margin-bottom: 15px; }
+        .modal-content .modal-body h4 { color: #e74c3c; margin: 20px 0 10px; font-size: 19px; }
+        .modal-content .modal-body ul { padding-right: 25px; margin-bottom: 15px; }
+        .modal-content .modal-body li { margin-bottom: 8px; }
+
+        .keo-footer {
+            background: #1a1a2e;
+            color: #8a96b0;
+            text-align: center;
+            padding: 15px 10px;
+            font-size: 11px;
+            font-family: 'Cairo', sans-serif;
+            margin-top: 40px;
+        }
+        .keo-footer .brand-keo { color: #e94560; font-weight: bold; }
+        .keo-footer .brand-ai { color: #f5a623; font-weight: bold; }
+        .keo-footer .footer-links { margin-bottom: 8px; }
+        .keo-footer .footer-links a { color: #8a96b0; margin: 0 8px; text-decoration: none; font-size: 12px; }
+        .keo-footer .footer-links a:hover { color: #e94560; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">🇫🇷 Madame Aya</div>
+        <ul class="nav-links">
+            <li><a href="index.html">الرئيسية</a></li>
+            <li><a href="about.html">من نحن</a></li>
+            <li><a href="blog.html" class="active">المدونة</a></li>
+            <li><a href="contact.html">تواصل معنا</a></li>
+            <li><a href="courses.html">المنصة التعليمية</a></li>
+            <li>
+                <select class="custom-lang-selector" onchange="changeLanguage(this.value)">
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                    <option value="en">English</option>
+                </select>
+                <div id="google_translate_element"></div>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="page-header">
+        <h1>📝 مدونة المنصة</h1>
+        <p>مقالات ونصائح بسيطة حول كل درس وفيديو ننشره على المنصة، لتساعدك في رحلة تعلم اللغة الفرنسية.</p>
+    </div>
+
+    <div class="container">
+        <div class="blog-grid" id="blogGrid"></div>
+    </div>
+
+    <!-- نافذة عرض المقال -->
+    <div id="blogModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" id="closeModal">&times;</span>
+            <div class="modal-date" id="modalDate"></div>
+            <h2 id="modalTitle"></h2>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <div class="keo-footer">
+        <div class="footer-links">
+            <a href="terms.html">الأحكام والشروط</a> |
+            <a href="privacy.html">سياسة الخصوصية</a>
+        </div>
+        Powered by <span class="brand-keo">keo</span><span class="brand-ai">ai</span>
+    </div>
+
+    <script>
+        // ===== قائمة المقالات =====
+        const posts = [
+            {
+                icon: "🚀",
+                date: "أول المقالات",
+                title: "أهلاً بك في مدونة Madame Aya",
+                excerpt: "تعرف على هدف المدونة وكيف تساعدك مقالاتنا على متابعة كل فيديو ودرس جديد بسهولة.",
+                body: `
+                    <p>أهلاً بك في مدونة منصة <strong>Le Français avec Madame Aya</strong>! 🎉</p>
+                    <p>أنشأنا هذه المدونة لتكون مرجعاً بسيطاً يرافق كل فيديو وكل درس نطرحه على المنصة. بعد كل درس جديد ستجد هنا مقالاً مختصراً يلخّص أهم ما ورد فيه، مع نصيحة سريعة تساعدك على التثبيت والمذاكرة.</p>
+                    <h4>ماذا ستجد في المدونة؟</h4>
+                    <ul>
+                        <li>ملخص بسيط لكل فيديو بعد نزوله مباشرة.</li>
+                        <li>نصائح عملية لتحسين النطق والكتابة.</li>
+                        <li>تنبيهات حول الأخطاء الشائعة بين الطلاب.</li>
+                        <li>روابط الدروس الجديدة على يوتيوب أولاً بأول.</li>
+                    </ul>
+                    <p>نتمنى لك رحلة تعلم ممتعة ومثمرة! 🇫🇷</p>
+                `
+            },
+            {
+                icon: "📚",
+                date: "نصائح عامة",
+                title: "كيف تذاكر اللغة الفرنسية بطريقة صحيحة؟",
+                excerpt: "خمس خطوات بسيطة تساعدك على ترسيخ المعلومة من كل فيديو دون ضغط أو ملل.",
+                body: `
+                    <p>كثيرون يشتكون من نسيان المفردات الفرنسية بعد فترة قصيرة من المشاهدة. السر ليس في كثرة الدروس، بل في طريقة المذاكرة. إليك خطوات عملية:</p>
+                    <h4>1) شاهد الفيديو مرة للمتعة</h4>
+                    <p>لا تكتب شيئاً في المرة الأولى، فقط استمع وفهم الفكرة العامة.</p>
+                    <h4>2) شاهده مرة ثانية واكتب</h4>
+                    <p>في المرة الثانية، وقّف الفيديو عند كل جملة جديدة واكتب المفردات.</p>
+                    <h4>3) حل الاختبار فوراً</h4>
+                    <p>بعد كل فيديو في المنصة ستجد سؤالاً اختبارياً — حله مباشرة ليثبت المعلومة.</p>
+                    <h4>4) أعد الكلمة بصوت عالٍ</h4>
+                    <p>النطق بصوت عالٍ يساعد الذاكرة بشكل كبير، لا تكتفِ بالقراءة الصامتة.</p>
+                    <h4>5) راجع بعد 3 أيام</h4>
+                    <p>ارجع لفيديو الدرس بعد 3 أيام لمراجعة سريعة، وستلاحظ الفرق.</p>
+                    <p>التزم بهذه الخطوات في كل درس، وستجد تقدماً ملموساً في أسابيع. 💪</p>
+                `
+            },
+            {
+                icon: "🎬",
+                date: "فيديوهات مميزة",
+                title: "أبرز الفيديوهات التعليمية على القناة",
+                excerpt: "دليل سريع لأهم الفيديوهات المنشورة على قناتنا ليكون نقطة انطلاقك المثالية.",
+                body: `
+                    <p>على قناتنا على يوتيوب <strong>Le Français avec Madame Aya</strong> ننشر بانتظام فيديوهات قصيرة ومركزة لكل المراحل الدراسية. إليك أهم ما يمكنك البدء بمشاهدته:</p>
+                    <h4>فيديوهات المبتدئين</h4>
+                    <p>إذا كنت في الصفوف الابتدائية، ابدأ بفيديوهات الحروف والأرقام والتعارف، فهي أساس كل ما سيأتي بعدها.</p>
+                    <h4>فيديوهات القواعد</h4>
+                    <p>سلسلة قواعد مركزة تشرح كل قاعدة في فيديو قصير لا يتجاوز عدة دقائق.</p>
+                    <h4>فيديوهات النطق</h4>
+                    <p>سلسلة نشرح فيها نطق الكلمات الصعبة والمشتركة بين الطلاب.</p>
+                    <p>يمكنك متابعة كل فيديو جديد فور نزوله بالاشتراك في <a href="https://www.youtube.com/@lefrancaisavecaya" target="_blank" style="color:#e74c3c;">قناتنا على يوتيوب</a>، وستجد روابط الدروس مباشرة في صفحة المدونة بعد كل إصدار.</p>
+                `
+            },
+            {
+                icon: "🗣️",
+                date: "نطق",
+                title: "أخطاء شائعة في النطق الفرنسي وكيف تتجنبها",
+                excerpt: "تعرف على أكثر الأخطاء شيوعاً بين الطلاب في نطق الحروف الفرنسية وكيف تصححها.",
+                body: `
+                    <p>النطق الفرنسي قد يكون محيراً في البداية، لكن مع التدريب يصبح سهلاً. إليك أبرز الأخطاء:</p>
+                    <h4>1) نطق حرف "R" الفرنسي</h4>
+                    <p>حرف الـ R في الفرنسية يُنطق من الحنجرة وليس كحرف الراء العربي. تدرّب على النطق بهدوء في البداية.</p>
+                    <h4>2) خلط بين "U" و "OU"</h4>
+                    <p>حرف U يُنطق بشفاه مضمومة للأمام، أما OU فهو أقرب لـ "وو" العربية.</p>
+                    <h4>3) الحروف الصامتة في آخر الكلمة</h4>
+                    <p>في أغلب الكلمات الفرنسية لا تُنطق الحروف الأخيرة، خاصة الحروف الساكنة. استثناآت قليلة مثل C و R و F و L.</p>
+                    <h4>4) الـ "Nasales" (الحروف الأنفية)</h4>
+                    <p>أصوات مثل "on" و "an" و "in" تُنطق من الأنف، تدرّب عليها بكثرة فهي تميّز الفرنسية.</p>
+                    <p>شاهد فيديوهات النطق على قناتنا للتدريب السمعي، فالأذن هي أول خطوة لإتقان النطق. 🎧</p>
+                `
+            },
+            {
+                icon: "✍️",
+                date: "كتابة",
+                title: "خطوات بسيطة لتحسين كتابتك بالفرنسية",
+                excerpt: "كيف تطور مهارة الكتابة تدريجياً من جملة واحدة إلى فقرة كاملة بشكل صحيح.",
+                body: `
+                    <p>الكتابة بالفرنسية مهارة تتطلب الصبر، لكنها أسرع مهارة يمكنك قياس تقدمك فيها. إليك خطة بسيطة:</p>
+                    <h4>المرحلة الأولى: جمل قصيرة</h4>
+                    <p>ابدأ بكتابة جمل بسيطة من 3-4 كلمات عن نفسك أو يومك. مثلاً: "Je suis étudiant." أو "J'aime le café."</p>
+                    <h4>المرحلة الثانية: جمل مركبة</h4>
+                    <p>بعد إتقان الجملة البسيطة، اربط جملتين بأدوات ربط مثل "et" (و) و "mais" (لكن) و "parce que" (لأن).</p>
+                    <h4>المرحلة الثالثة: فقرة كاملة</h4>
+                    <p>اكتب فقرة من 4-5 جمل حول موضوع تحبه، واطلب من معلمك مراجعتها.</p>
+                    <h4>نصيحة ذهبية</h4>
+                    <p>اكتب ولو سطراً واحداً كل يوم. الاستمرار أهم من الكمية. بعد شهر ستجد أنك كتبت 30 سطراً دون أن تشعر بالضغط! ✨</p>
+                `
+            },
+            {
+                icon: "🎯",
+                date: "منهجية",
+                title: "كيف تستعد لاختبار الدرس وتحصل على الشهادة؟",
+                excerpt: "خطوات عملية للاستعداد لاختبارات المنصة وتجاوز نسبة 70% للحصول على الشهادة.",
+                body: `
+                    <p>كل درس على المنصة يتبعه اختبار قصير، والحصول على 70% أو أكثر يمنحك شهادة إتمام الدرس. إليك كيف تستعد:</p>
+                    <h4>قبل الاختبار</h4>
+                    <ul>
+                        <li>شاهد الفيديو كاملاً دون قفز.</li>
+                        <li>اكتب المفردات الجديدة في دفترك.</li>
+                        <li>أعد كتابة الجمل المهمة بيديك.</li>
+                    </ul>
+                    <h4>أثناء الاختبار</h4>
+                    <ul>
+                        <li>اقرأ السؤال بتمهل قبل اختيار الإجابة.</li>
+                        <li>استبعد الإجابات الخاطئة أولاً.</li>
+                        <li>لا تتسرع — الوقت متاح.</li>
+                    </ul>
+                    <h4>بعد الاختبار</h4>
+                    <p>إذا لم تصل لـ 70%، لا بأس! شاهد الفيديو مرة ثانية وأعد المحاولة. الهدف هو الفهم وليس العبور فقط. 💪</p>
+                    <p>تذكر: شهادة كل درس تثبت أنك أتقنته، فاجمعها كمحفّز على الاستمرار. 🎓</p>
+                `
+            }
+        ];
+
+        // ===== عرض المقالات =====
+        const grid = document.getElementById("blogGrid");
+        posts.forEach((post, idx) => {
+            const card = document.createElement("div");
+            card.className = "blog-card";
+            card.innerHTML = `
+                <div class="blog-card-image">${post.icon}</div>
+                <div class="blog-card-body">
+                    <div class="blog-card-date">📅 ${post.date}</div>
+                    <h3>${post.title}</h3>
+                    <p>${post.excerpt}</p>
+                    <div class="blog-read-more">اقرأ المزيد ←</div>
+                </div>
+            `;
+            card.addEventListener("click", () => openPost(idx));
+            grid.appendChild(card);
+        });
+
+        // ===== فتح المقال في النافذة =====
+        const modal = document.getElementById("blogModal");
+        function openPost(idx) {
+            const post = posts[idx];
+            document.getElementById("modalDate").innerText = "📅 " + post.date;
+            document.getElementById("modalTitle").innerText = post.title;
+            document.getElementById("modalBody").innerHTML = post.body;
+            modal.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        }
+        document.getElementById("closeModal").addEventListener("click", () => {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        });
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) {
+                modal.style.display = "none";
+                document.body.style.overflow = "auto";
+            }
+        });
+    </script>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'ar', includedLanguages: 'ar,en,fr', autoDisplay: false }, 'google_translate_element');
+        }
+        function changeLanguage(lang) {
+            var selectField = document.querySelector(".goog-te-combo");
+            if (selectField) {
+                selectField.value = lang;
+                selectField.dispatchEvent(new Event('change'));
+            }
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>
